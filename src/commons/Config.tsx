@@ -14,7 +14,7 @@ interface IConfig {
 
 const Config: IConfig = {
   app: {
-    name: "book"
+    name: "Book"
   },
   os: {
     ios: "ios",
