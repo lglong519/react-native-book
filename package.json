@@ -1,64 +1,42 @@
 {
-  "name": "book",
+  "name": "Book",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "web": "react-scripts-ts start",
     "build": "cd android/ && ./gradlew assembleRelease",
     "ios": "react-native run-ios",
-    "android": "react-native run-android",
-    "test": "jest --coverage",
-    "lint": "tslint -p tsconfig.json -c tslint.json",
-    "rebuild": "rm -rf ios; rm -rf android; react-native upgrade; rm -f .babelrc; rm -f .buckconfig; rm -f .flowconfig; rm -f .watchmanconfig; rm -f .gitattributes;"
+    "dev": "react-native run-android",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
   },
   "dependencies": {
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-native": "0.56.0",
-    "react-native-web": "^0.8.8",
-    "react-navigation": "^3.0.9",
+    "prop-types": "^15.6.0",
+    "react": "16.0.0-beta.5",
+    "react-native": "0.49.3",
+    "react-native-elements": "^0.18.4",
+    "react-native-extended-stylesheet": "^0.8.0",
+    "react-native-vector-icons": "^4.4.2",
+    "react-navigation": "^1.0.0-beta.21",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
     "react-scripts-ts": "^2.16.0"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.0",
-    "@types/react": "^16.4.6",
-    "@types/react-native": "^0.56.3",
-    "@types/react-navigation": "^3.0.1",
-    "@types/react-test-renderer": "^16.0.1",
-    "babel-jest": "23.4.0",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "21.2.0",
     "babel-preset-react-native": "4.0.0",
-    "jest": "23.4.1",
-    "prettier": "^1.13.7",
-    "react-art": "^16.4.1",
+    "eslint": "^5.12.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-teslint": "^3.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-react": "^7.12.4",
+    "jest": "21.2.1",
+    "react-test-renderer": "16.0.0-beta.5",
     "react-native-typescript-transformer": "^1.2.10",
-    "react-test-renderer": "^16.4.1",
-    "ts-jest": "^23.0.1",
     "typescript": "^2.9.2"
   },
-  "babel": {
-    "presets": [
-      "react-native"
-    ]
-  },
   "jest": {
-    "preset": "react-native",
-    "transform": {
-      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "globals": {
-      "ts-jest": {
-        "useBabelrc": true
-      }
-    }
+    "preset": "react-native"
   }
 }

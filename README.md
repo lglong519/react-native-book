@@ -3,40 +3,37 @@
 ## install
 
 ```sh
-npm i -g yarn
-git clone git@github.com:ethanneff/react-native-web-typescript.git
-cd react-native-typescript
-yarn install
+npm install
 ```
 
 ### run
 
 ```sh
-yarn ios
+npm run ios
 ```
 
 ```sh
-yarn android
+npm run android
 ```
 
 ```sh
-yarn web
+npm run web
 ```
 
 ### lint
 
 ```sh
-yarn lint
+npm run lint
 ```
 
 ### test
 
 ```sh
-yarn test
+npm run test
 ```
 
 ### deploy
 
 ```sh
-yarn build
+npm run build
 ```

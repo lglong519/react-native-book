@@ -1,4 +1,4 @@
-package com.Book;
+package com.book;
 
 import com.facebook.react.ReactActivity;
 

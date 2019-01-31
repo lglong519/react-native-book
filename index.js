@@ -1,3 +1,4 @@
-// app entry
-import App from './src';
-export default App;
+import { AppRegistry } from "react-native";
+import App from "./src/App";
+
+AppRegistry.registerComponent("Book", () => App);
