@@ -1,33 +1,32 @@
 import * as React from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
-
 import {
 	ScrollView,
 	StyleSheet,
 	Text,
 	View,
 	Image,
-	SectionList
+	SectionList,
+	TouchableOpacity,
 } from "react-native";
+import { Header, Footer } from "../../components";
+import { Moment } from "../../lib";
 
-const book = {
-	_id: 13, id: 3714, title: "飞剑问道", author: "我吃西红柿", sort: "xiuzhen", cover: "https://m.biquke.com/files/article/image/3/3714/3714s.jpg", info: " 在这个世界，有狐仙、河神、水怪、大妖，也有求长生的修行者。 修行者们， 开法眼，可看妖魔鬼怪。 炼一口飞剑，可千里杀敌。 千里眼、顺风耳，更可探查四方。 …… 秦府二公子‘秦云’，便是一位修行者……", views: 59056269, sequence: 3, status: "连载中", uploadDate: "2019-01-20T11:36:12.000Z", updateDate: "2019-01-26T12:46:51.000Z", firstSection: "飞剑问道 新书预览", lastSection: "第十九篇 第十五章 赶紧走", dayvisit: 1, weekvisit: 1, monthvisit: 1, weekvote: 4, monthvote: 2, allvote: 1, goodnum: 0, size: 0, goodnew: 0, createdAt: "2019-01-20T11:36:12.000Z", updatedAt: "2019-01-20T11:36:12.000Z", sortn: "修真小说", fid: 2166271, lid: 10049872
-};
+const moment = new Moment("yyyy-MM-dd hh:mm");
+
 class Sections extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			book,
-			// book: {
-			// 	title: "",
-			// 	author: "",
-			// 	info: " ",
-			// 	status: "",
-			// 	lastSection: "",
-			// 	sortn: "",
-			// 	updateDate: "",
-			// 	cover: undefined,
-			// },
+			book: {
+				title: "",
+				author: "",
+				info: " ",
+				status: "",
+				lastSection: "",
+				sortn: "",
+				updateDate: "",
+				cover: undefined,
+			},
 			sections: [],
 			newSections: []
 		};
@@ -45,18 +44,6 @@ class Sections extends React.Component {
 			</View>
 		);
 	};
-
-	moment = (t) => {
-		const time = new Date(t);
-		const month = this.pad(time.getMonth() + 1);
-		const date = this.pad(new Date(time).getDate());
-		const hours = this.pad(new Date(time).getHours());
-		const minutes = this.pad(new Date(time).getMinutes());
-		const year = this.pad(new Date(time).getFullYear());
-		return `${year}-${month}-${date} ${hours}:${minutes}`;
-	};
-
-	pad = value => (Number(value) < 10 ? `0${value}` : value);
 
 	renderRecSubCell(item, index) {
 		return (
@@ -111,6 +98,14 @@ class Sections extends React.Component {
 			});
 	}
 
+	headerTitle() {
+		return `${this.state.book.title} 目录(共${this.state.sections.length}章)`;
+	}
+
+	toContents(sid) {
+		return this.props.navigation.navigate("Contents", { sid });
+	}
+
 	componentDidMount() {
 		this.fetchData();
 	}
@@ -121,22 +116,16 @@ class Sections extends React.Component {
 			index,
 			section: { title, data }
 		}) => (
-			<View key={index} style={styles.hotItem}>
+			<TouchableOpacity activeOpacity={0.5}
+				onPress={() => this.toContents(item.id)}
+				key={index} style={styles.hotItem}>
 				<Text>{item.title}</Text>
-			</View>
+			</TouchableOpacity>
 		);
 		return (
 			<ScrollView style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.btns} onPress={() => this.props.navigation.goBack()}>
-						返回
-					</Text>
-					<Text style={styles.headerTitle}>{this.state.book.title}&nbsp;目录(共{this.state.sections.length}章)</Text>
-					<Text style={styles.btns} onPress={() => this.props.navigation.navigate("Index")}>
-						首页
-					</Text>
-				</View>
-
+				<Header navigation={this.props.navigation} type={3}
+					title={this.headerTitle()} />
 				<View style={[styles.hotItem, { marginLeft: 15 }]}>
 					<Image
 						style={{ width: 100, height: 130 }}
@@ -147,9 +136,20 @@ class Sections extends React.Component {
 						<Text>作者: {this.state.book.author}</Text>
 						<Text>分类: {this.state.book.sortn}</Text>
 						<Text>状态: {this.state.book.status}</Text>
-						<Text>更新: {this.moment(this.state.book.updateDate)}</Text>
+						<Text>更新: {moment(this.state.book.updateDate)}</Text>
 						<Text>最新: {this.state.book.lastSection}</Text>
 					</View>
+				</View>
+				<View style={styles.buttonBox}>
+					<TouchableOpacity activeOpacity={0.5}
+						style={styles.button}
+						onPress={() => this.toContents(this.state.book.fid)}>
+						<Text style={{ color: "#fff" }}>开始阅读</Text>
+					</TouchableOpacity>
+					<TouchableOpacity activeOpacity={0.5}
+						style={styles.button}>
+						<Text style={{ color: "#fff" }}>加入书架</Text>
+					</TouchableOpacity>
 				</View>
 				<SectionList
 					style={styles.section}
@@ -175,10 +175,7 @@ class Sections extends React.Component {
 					]}
 					keyExtractor={(item, index) => index}
 				/>
-				<View style={styles.footer}>
-					<Text style={styles.footerItem} onPress={() => this.props.navigation.navigate("Index")}>首页</Text>
-					<Text style={styles.footerItem} onPress={() => this.props.navigation.navigate("Bookshelf")}>书架</Text>
-				</View>
+				<Footer navigation={this.props.navigation}/>
 			</ScrollView>
 		);
 	}
@@ -189,29 +186,6 @@ class Sections extends React.Component {
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: "#F5F5F5"
-	},
-	header: {
-		alignSelf: "stretch",
-		display: "flex",
-		justifyContent: "space-between",
-		alignItems: "center",
-		flexDirection: "row",
-		height: 40,
-		backgroundColor: "#1abc9c",
-		paddingLeft: 15,
-		paddingRight: 15
-	},
-	btns: {
-		color: "#fff",
-		backgroundColor: "#1ce0b9",
-		paddingLeft: 7,
-		paddingRight: 7,
-		paddingTop: 2,
-		paddingBottom: 2,
-		borderRadius: 1.5,
-	},
-	headerTitle: {
-		color: "#fff"
 	},
 	recItem: {
 		flex: 1,
@@ -260,16 +234,21 @@ const styles = StyleSheet.create({
 	colorEm: {
 		color: "#333",
 	},
-	footer: {
+	buttonBox: {
 		flexDirection: "row",
+		justifyContent: "space-between",
+		marginTop: 8,
+		marginBottom: 8,
+	},
+	button: {
+		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
-		marginTop: 15,
-		marginBottom: 20,
-	},
-	footerItem: {
-		marginRight: 10,
-		marginLeft: 10,
+		marginLeft: 8,
+		marginRight: 8,
+		height: 35,
+		backgroundColor: "#1abc9c",
+		borderRadius: 5,
 	}
 });
 

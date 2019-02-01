@@ -1,13 +1,13 @@
 import React from "react";
 import { Platform } from "react-native";
 import { StackNavigator } from "react-navigation";
-import Index from "./components/Index";
-import Sort from "./components/Sort";
-import Top from "./components/Top";
-import Full from "./components/Full";
-import Bookshelf from "./components/Bookshelf";
-import Sections from "./components/book/Sections";
-import Contents from "./components/book/Contents";
+import Index from "./views/Index";
+import Sort from "./views/Sort";
+import Top from "./views/Top";
+import Full from "./views/Full";
+import Bookshelf from "./views/Bookshelf";
+import Sections from "./views/book/Sections";
+import Contents from "./views/book/Contents";
 
 const RouteConfigs = {
 	Index: {

@@ -1,15 +1,15 @@
 import * as React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-
 import {
 	ScrollView,
-	Button,
 	StyleSheet,
 	Text,
 	View,
-	Image,
-	SectionList
+	SectionList,
+	TouchableOpacity,
 } from "react-native";
+import { Nav, Footer, Header } from "../components";
+
 
 const bookshelf = {
 	id: 1,
@@ -71,6 +71,13 @@ class Index extends React.Component {
 		return this.props.navigation.navigate("Sections", { bid });
 	}
 
+	toContents(sid) {
+		if (!sid) {
+			return;
+		}
+		this.props.navigation.navigate("Contents", { sid });
+	}
+
 	componentDidMount() {
 		// this.fetchData();
 	}
@@ -82,30 +89,24 @@ class Index extends React.Component {
 			section: { title, data }
 		}) => (
 			<View key={index} style={styles.hotItem}>
-				<Text style={styles.lineHeight} onPress={() => this.toSections(item.book)}>书名: {item.btitle}</Text>
-				<Text style={styles.lineHeight}>最新: {item.stitle}</Text>
-				<Text style={styles.lineHeight}>书签: {item.mtitle}</Text>
-				<Text style={[styles.colorRed, styles.lineHeight]}>删除本书</Text>
+				<TouchableOpacity onPress={() => this.toSections(item.book)}>
+					<Text style={styles.lineHeight}>书名: {item.btitle}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => this.toContents(item.sid)}>
+					<Text style={styles.lineHeight}>最新: {item.stitle}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => this.toContents(item.mid)}>
+					<Text style={styles.lineHeight}>书签: {item.mtitle}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity>
+					<Text style={[styles.colorRed, styles.lineHeight]}>删除本书</Text>
+				</TouchableOpacity>
 			</View>
 		);
 		return (
 			<ScrollView style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.btns} onPress={() => this.props.navigation.navigate("Index")}>
-						<Icon name={"home"} size={22} style={{ color: "#fff" }}/>
-					</Text>
-					<Text style={styles.btns}>我的书架</Text>
-					<Text style={styles.btns} onPress={() => this.props.navigation.navigate("Bookshelf")}>
-						注销
-					</Text>
-				</View>
-				<View style={styles.nav}>
-					<Text onPress={() => this.props.navigation.navigate("Index")}>首页</Text>
-					<Text onPress={() => this.props.navigation.navigate("Sort")}>分类</Text>
-					<Text onPress={() => this.props.navigation.navigate("Top")}>排行</Text>
-					<Text onPress={() => this.props.navigation.navigate("Full")}>完本</Text>
-				</View>
-
+				<Header navigation={this.props.navigation} type={2} title={"我的书架"}/>
+				<Nav navigation={this.props.navigation}/>
 				<SectionList
 					style={styles.section}
 					renderItem={({ item, index, section }) => (
@@ -120,10 +121,7 @@ class Index extends React.Component {
 					]}
 					keyExtractor={(item, index) => item.id + index}
 				/>
-				<View style={styles.footer}>
-					<Text style={styles.footerItem} onPress={() => this.props.navigation.navigate("Index")}>首页</Text>
-					<Text style={styles.footerItem} onPress={() => this.props.navigation.navigate("Bookshelf")}>书架</Text>
-				</View>
+				<Footer navigation={this.props.navigation}/>
 			</ScrollView>
 		);
 	}
@@ -148,17 +146,6 @@ const styles = StyleSheet.create({
 	},
 	btns: {
 		color: "#fff"
-	},
-	nav: {
-		alignSelf: "stretch",
-		display: "flex",
-		justifyContent: "space-around",
-		alignItems: "center",
-		flexDirection: "row",
-		height: 40,
-		borderBottomWidth: 0.8,
-		borderBottomColor: "#ccc",
-		backgroundColor: "#fff"
 	},
 	recContent: {
 		flexDirection: "row",
@@ -198,17 +185,6 @@ const styles = StyleSheet.create({
 	},
 	colorEm: {
 		color: "#333",
-	},
-	footer: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-		marginTop: 15,
-		marginBottom: 20,
-	},
-	footerItem: {
-		marginRight: 10,
-		marginLeft: 10,
 	},
 	lineHeight: {
 		marginTop: 2,

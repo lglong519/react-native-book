@@ -26,6 +26,7 @@
 	"max-len":0,
 	"quotes": ["error", "double"],
 	"no-unused-vars":1,
+	"no-useless-constructor":0,
     "import/prefer-default-export": 0
   },
   "plugins": ["react"],

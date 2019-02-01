@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+	"reload":"adb shell input keyevent 82",
     "build": "cd android/ && ./gradlew assembleRelease",
     "ios": "react-native run-ios",
     "dev": "react-native run-android",
