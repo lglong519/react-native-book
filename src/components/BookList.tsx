@@ -7,7 +7,7 @@ import {
 	SectionList,
 	TouchableOpacity
 } from "react-native";
-import { Moment } from "../lib";
+import { Moment } from "../libs";
 
 const moment = new Moment("yyyy-MM-dd");
 

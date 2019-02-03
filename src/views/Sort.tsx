@@ -10,6 +10,7 @@ import {
 import {
 	Header, Nav, Footer, BookList
 } from "../components";
+import { queryBooks } from "../libs/api";
 
 const blocks = [
 	{
@@ -42,26 +43,31 @@ class Sort extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			enthusiasmLevel: props.enthusiasmLevel || 1,
 			sortData: [],
 			sort: "",
 		};
 	}
 
+	static navigationOptions = {
+		title: "Sort",
+		gesturesEnabled: true,
+	};
+
 	queryBooks(item) {
 		this.setState({
 			sort: item.name
 		});
-		fetch(`http://dev.mofunc.com/ws/books/?q={"sort":"${item.sort}"}&sort=-updateDate&p=0`)
-			.then(response => response.json())
-			.then((results) => {
-				this.setState({
-					sortData: results
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+		queryBooks({
+			q: `{"sort":"${item.sort}"}`,
+			sort: "-updateDate",
+			p: 0
+		}).then((res) => {
+			this.setState({
+				sortData: res.data._55
 			});
+		}).catch((error) => {
+			console.error(error);
+		});
 	}
 
 	toSections(bid) {

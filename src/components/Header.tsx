@@ -7,6 +7,7 @@ import {
 	View,
 	TouchableOpacity,
 	TouchableHighlight,
+	Alert,
 } from "react-native";
 
 class Header extends React.Component {
@@ -14,8 +15,31 @@ class Header extends React.Component {
 		super(props);
 	}
 
-	navTo(type) {
+	async navTo(type) {
+		if (type === "Bookshelf") {
+			const accessToken = await global.storage.load({ key: "accessToken" });
+			if (!accessToken) {
+				return this.props.navigation.navigate("Signin");
+			}
+		}
 		return this.props.navigation.navigate(type);
+	}
+
+	logout() {
+		Alert.alert(
+			"提示",
+			"退出登录?",
+			[
+				{ text: "取消" },
+				{
+					text: "确定",
+					onPress: async () => {
+						await global.storage.remove({ key: "accessToken" });
+						this.navTo("Index");
+					}
+				},
+			],
+		);
 	}
 
 	render() {
@@ -62,7 +86,7 @@ class Header extends React.Component {
 						</Text>
 					</TouchableHighlight>
 					<Text style={styles.icon}>{this.props.title}</Text>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Index")}>
+					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.logout()}>
 						<Text style={styles.icon}>
 							注销
 						</Text>

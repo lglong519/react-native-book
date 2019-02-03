@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "esnext",
-    "target": "es5",
+    "target": "esnext",
     "baseUrl": ".",
     "lib": ["es6", "dom"],
     "sourceMap": true,

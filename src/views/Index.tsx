@@ -12,7 +12,8 @@ import {
 import {
 	Header, Nav, Footer, BookList
 } from "../components";
-import { Moment } from "../lib";
+import { Moment } from "../libs";
+import { getBooks } from "../libs/api";
 
 const moment = new Moment("MM-dd hh:mm:ss");
 
@@ -27,7 +28,8 @@ class Index extends React.Component {
 	}
 
 	static navigationOptions = {
-		title: "",
+		title: "Index",
+		gesturesEnabled: true,
 	};
 
 	renderSectionHeader = (info) => {
@@ -59,26 +61,20 @@ class Index extends React.Component {
 	}
 
 	async fetchData() {
-		await fetch("http://dev.mofunc.com/ws/books/")
-			.then(response => response.json())
-			.then((results) => {
-				this.setState({
-					hotData: results
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+		await getBooks().then((results) => {
+			this.setState({
+				hotData: results
 			});
-		await fetch("http://dev.mofunc.com/ws/books/?sort=-updatedAt")
-			.then(response => response.json())
-			.then((results) => {
-				this.setState({
-					recentData: results
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+		}).catch((error) => {
+			console.error(error);
+		});
+		await getBooks({ sort: "-updateDate" }).then((results) => {
+			this.setState({
+				recentData: results
 			});
+		}).catch((error) => {
+			console.error(error);
+		});
 		this.setState({
 			loading: false
 		});

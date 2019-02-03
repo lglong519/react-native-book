@@ -6,7 +6,7 @@ import {
 import {
 	Nav, Footer, Header, BookList
 } from "../components";
-
+import { queryBooks } from "../libs/api";
 
 class Index extends React.Component {
 	constructor(props) {
@@ -17,16 +17,17 @@ class Index extends React.Component {
 	}
 
 	fetchData() {
-		fetch("http://dev.mofunc.com/ws/books/?q={\"status\":\"完本\"}&sort=-updateDate&p=1")
-			.then(response => response.json())
-			.then((results) => {
-				this.setState({
-					fullData: results
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+		queryBooks({
+			q: "{\"status\":\"完本\"}",
+			sort: "-updateDate",
+			p: 0
+		}).then((res) => {
+			this.setState({
+				fullData: res.data._55
 			});
+		}).catch((error) => {
+			console.error(error);
+		});
 	}
 
 	componentDidMount() {

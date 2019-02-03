@@ -7,8 +7,10 @@ import {
 	View,
 	TouchableOpacity,
 	ActivityIndicator,
+	Alert,
 } from "react-native";
 import { Header, Footer } from "../../components";
+import { bookmark, footsteps, getContents } from "../../libs/api";
 
 class Contents extends React.Component {
 	constructor(props) {
@@ -18,6 +20,33 @@ class Contents extends React.Component {
 		};
 	}
 
+	async bookmark() {
+		try {
+			await bookmark(this.state.data.book, this.state.data.id);
+			Alert.alert(
+				"提示",
+				"加入书签成功！",
+				[
+					{ text: "确定" },
+				],
+			);
+		} catch (e) {
+			if (e === 401) {
+				Alert.alert(
+					"未登录",
+					"前往登录?",
+					[
+						{ text: "取消" },
+						{
+							text: "确定",
+							onPress: async () => this.props.navigation.navigate("Signin")
+						},
+					],
+				);
+			}
+		}
+	}
+
 	fetchData() {
 		if (this.props.navigation && this.props.navigation.state && this.props.navigation.state.params && this.props.navigation.state.params.sid) {
 			//
@@ -25,17 +54,17 @@ class Contents extends React.Component {
 			return;
 		}
 		const { sid } = this.props.navigation.state.params;
-		// const sid = 3138457;
-		fetch(`http://dev.mofunc.com/ws/books/sections/${sid}/contents`)
-			.then(response => response.json())
-			.then((result) => {
-				this.setState({
-					data: result
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+		getContents(sid).then((result) => {
+			this.setState({
+				data: result
 			});
+			return footsteps("section", {
+				section: result.id,
+				book: result.book,
+				btitle: result.btitle,
+				stitle: result.title,
+			});
+		});
 	}
 
 	contents() {
@@ -85,7 +114,9 @@ class Contents extends React.Component {
 				style={styles.button}>
 				<Text style={{ color: "#fff" }}>下一章</Text>
 			</TouchableOpacity>
-			<TouchableOpacity activeOpacity={0.5}
+			<TouchableOpacity
+				onPress={() => this.bookmark()}
+				activeOpacity={0.5}
 				style={styles.button}>
 				<Text style={{ color: "#fff" }}>加书签</Text>
 			</TouchableOpacity>

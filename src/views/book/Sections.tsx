@@ -7,9 +7,13 @@ import {
 	Image,
 	SectionList,
 	TouchableOpacity,
+	Alert,
 } from "react-native";
 import { Header, Footer } from "../../components";
-import { Moment } from "../../lib";
+import { Moment } from "../../libs";
+import {
+	addToBookshelf, footsteps, querySections, getBook
+} from "../../libs/api";
 
 const moment = new Moment("yyyy-MM-dd hh:mm");
 
@@ -66,36 +70,59 @@ class Sections extends React.Component {
 			return;
 		}
 		const { bid } = this.props.navigation.state.params;
-		fetch(`http://dev.mofunc.com/ws/books/${bid}`)
-			.then(response => response.json())
+		getBook(bid)
 			.then((result) => {
 				this.setState({
 					book: result
 				});
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-		fetch(`http://dev.mofunc.com/ws/books/${bid}/sections?sort=-sequence&pageSize=5`)
-			.then(response => response.json())
-			.then((results) => {
-				this.setState({
-					newSections: results
+				return footsteps("book", {
+					id: result.id,
+					author: result.author,
+					title: result.title,
 				});
-			})
-			.catch((error) => {
-				console.error(error);
 			});
-		fetch(`http://dev.mofunc.com/ws/books/${bid}/sections?pageSize=20`)
-			.then(response => response.json())
-			.then((results) => {
-				this.setState({
-					sections: results
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+		querySections(bid, {
+			sort: "-sequence",
+			pageSize: 5
+		}).then((result) => {
+			this.setState({
+				newSections: result.data._55
 			});
+		});
+		querySections(bid, {
+			pageSize: 20
+		}).then((result) => {
+			this.setState({
+				sections: result.data._55
+			});
+		});
+	}
+
+	async addToBookshelf() {
+		try {
+			await addToBookshelf(this.state.book.id);
+			Alert.alert(
+				"提示",
+				"加入书架成功！",
+				[
+					{ text: "确定" },
+				],
+			);
+		} catch (e) {
+			if (e === 401) {
+				Alert.alert(
+					"未登录",
+					"前往登录?",
+					[
+						{ text: "取消" },
+						{
+							text: "确定",
+							onPress: async () => this.props.navigation.navigate("Signin")
+						},
+					],
+				);
+			}
+		}
 	}
 
 	headerTitle() {
@@ -108,6 +135,26 @@ class Sections extends React.Component {
 
 	componentDidMount() {
 		this.fetchData();
+	}
+
+	cover() {
+		if (this.state.book.title) {
+			return <View style={[styles.hotItem, { marginLeft: 15 }]}>
+				<Image
+					style={{ width: 100, height: 130 }}
+					source={{ uri: this.state.book.cover }}
+				/>
+				<View style={styles.itemRight}>
+					<Text style={styles.btitle}>{this.state.book.title}</Text>
+					<Text>作者: {this.state.book.author}</Text>
+					<Text>分类: {this.state.book.sortn}</Text>
+					<Text>状态: {this.state.book.status}</Text>
+					<Text>更新: {moment(this.state.book.updateDate)}</Text>
+					<Text>最新: {this.state.book.lastSection}</Text>
+				</View>
+			</View>;
+		}
+		return null;
 	}
 
 	render() {
@@ -126,20 +173,7 @@ class Sections extends React.Component {
 			<ScrollView style={styles.container}>
 				<Header navigation={this.props.navigation} type={3}
 					title={this.headerTitle()} />
-				<View style={[styles.hotItem, { marginLeft: 15 }]}>
-					<Image
-						style={{ width: 100, height: 130 }}
-						source={{ uri: this.state.book.cover }}
-					/>
-					<View style={styles.itemRight}>
-						<Text style={styles.btitle}>{this.state.book.title}</Text>
-						<Text>作者: {this.state.book.author}</Text>
-						<Text>分类: {this.state.book.sortn}</Text>
-						<Text>状态: {this.state.book.status}</Text>
-						<Text>更新: {moment(this.state.book.updateDate)}</Text>
-						<Text>最新: {this.state.book.lastSection}</Text>
-					</View>
-				</View>
+				{this.cover()}
 				<View style={styles.buttonBox}>
 					<TouchableOpacity activeOpacity={0.5}
 						style={styles.button}
@@ -147,6 +181,7 @@ class Sections extends React.Component {
 						<Text style={{ color: "#fff" }}>开始阅读</Text>
 					</TouchableOpacity>
 					<TouchableOpacity activeOpacity={0.5}
+						onPress={() => this.addToBookshelf()}
 						style={styles.button}>
 						<Text style={{ color: "#fff" }}>加入书架</Text>
 					</TouchableOpacity>

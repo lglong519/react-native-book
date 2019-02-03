@@ -12,7 +12,13 @@ class Footer extends React.Component {
 		super(props);
 	}
 
-	navTo(type) {
+	async navTo(type) {
+		if (type === "Bookshelf") {
+			const accessToken = await global.storage.load({ key: "accessToken" });
+			if (!accessToken) {
+				return this.props.navigation.navigate("Signin");
+			}
+		}
 		return this.props.navigation.navigate(type);
 	}
 
