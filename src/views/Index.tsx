@@ -7,13 +7,17 @@ import {
 	Image,
 	SectionList,
 	TouchableOpacity,
-	ActivityIndicator
+	ActivityIndicator,
+	Dimensions,
 } from "react-native";
+import PageScrollView from "../components/PageScrollView";
 import {
 	Header, Nav, Footer, BookList
 } from "../components";
 import { Moment } from "../libs";
 import { getBooks } from "../libs/api";
+
+const { width: w, height: h } = Dimensions.get("window");
 
 const moment = new Moment("MM-dd hh:mm:ss");
 
@@ -90,7 +94,7 @@ class Index extends React.Component {
 			return null;
 		}
 		return <SectionList
-			style={styles.section}
+			style={[styles.section, { marginBottom: 0 }]}
 			renderItem={({ item, index, section }) => (
 				<Text key={index}>{item}</Text>
 			)}
@@ -98,8 +102,8 @@ class Index extends React.Component {
 			sections={[
 				{
 					title: "本站推荐",
-					data: [this.state.hotData.slice(0, 3)],
-					renderItem: overrideRenderRecBox
+					data: [],
+					// renderItem: overrideRenderRecBox
 				}
 			]}
 			keyExtractor={(item, index) => item.id + index}
@@ -112,14 +116,16 @@ class Index extends React.Component {
 			index,
 			section: { title, data }
 		}) => (
-			<TouchableOpacity activeOpacity={0.5}
+			<TouchableOpacity
+				activeOpacity={0.5}
 				onPress={() => this.toSections(item.id)}
-				key={index} style={styles.hotItem}>
+				key={index} style={styles.hotItem}
+			>
 				<Text style={{ alignSelf: "flex-start" }}>{index + 1}.</Text>
 				<View style={{ flex: 1 }}>
 					<View
 						style={{ flexDirection: "row", justifyContent: "space-between" }}>
-						<Text style={styles.colorEm}>
+						<Text style={styles.colorEm} numberOfLines={1}>
 							{item.title}
 					&nbsp; - &nbsp;
 							<Text>{item.author}</Text>
@@ -128,7 +134,7 @@ class Index extends React.Component {
 							{moment(item.updateDate)}
 						</Text>
 					</View>
-					<Text numberOfLines={1} ellipsizeMode={"tail"} style={{ marginTop: 5 }}>
+					<Text numberOfLines={1} ellipsizeMode={"tail"} style={{ marginTop: 8, fontSize: 12 }}>
 						{item.info}
 					</Text>
 				</View>
@@ -158,9 +164,27 @@ class Index extends React.Component {
 		if (!this.state.loading) {
 			return null;
 		}
-		return <View>
-			<ActivityIndicator size="large" color="#1abc9c" />
-		</View>;
+		return <ActivityIndicator size="large" color="#1abc9c" />;
+	}
+
+	swiper() {
+		let imgs = this.state.hotData.slice(0, 3).map(item => ({
+			uri: item.cover
+		}));
+		if (imgs.length) {
+			return <PageScrollView
+				ref={(ps) => { this.pageScrollView = ps; }}
+				didMount={() => { this.pageScrollView.manualScrollToPage(1); }}
+				style={{ width: w, height: w / 16 * 9, backgroundColor: "#fff" }}
+				imageStyle={{ backgroundColor: "#fff" }}
+				builtinStyle={{ backgroundColor: "#fff" }}
+				goToNextPageSpeed={5}
+				infiniteInterval={4000}
+				builtinStyle="sizeChangeMode"
+				builtinWH={{ width: 120, height: 150 }}
+				imageArr={imgs}/>;
+		}
+		return null;
 	}
 
 	componentDidMount() {
@@ -174,6 +198,7 @@ class Index extends React.Component {
 				<Nav navigation={this.props.navigation}/>
 				{this.spinning()}
 				{this.recSection()}
+				{this.swiper()}
 				<BookList navigation={this.props.navigation} books={this.state.hotData} title={"热门推荐"} type={"views"}/>
 				{this.recentSection()}
 				<Footer navigation={this.props.navigation}/>
@@ -205,7 +230,7 @@ const styles = StyleSheet.create({
 	sectionHeader: {
 		flexDirection: "row",
 		alignItems: "center",
-		height: 30,
+		height: 35,
 		paddingLeft: 10,
 		borderBottomWidth: 0.5,
 		borderBottomColor: "#ccc",
@@ -216,16 +241,19 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingLeft: 8,
 		paddingRight: 10,
-		paddingBottom: 5,
-		paddingTop: 5,
+		paddingBottom: 8,
+		paddingTop: 8,
 		borderBottomWidth: 0.5,
 		borderColor: "#e2e2e2"
 	},
 	colorOrg: {
-		color: "#ff8040"
+		color: "#ff8040",
+		flex: 0,
+		fontSize: 12,
 	},
 	colorEm: {
 		color: "#333",
+		flex: 1,
 	},
 });
 

@@ -8,6 +8,12 @@
     }
   },
   "rules": {
+	"no-nested-ternary":0,
+	"no-param-reassign":0,
+	"prefer-const":0,
+	"prefer-destructuring":0,
+	"no-unused-expressions":0,
+	"no-plusplus":0,
     "react/jsx-uses-vars": 1,
     "react/jsx-uses-react": 1,
     "no-tabs": 0,

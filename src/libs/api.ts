@@ -166,4 +166,5 @@ export const getBookshelf = async (params:any = {}) => get("dis/me/bookshelf", p
 export const delBookshelf = async (bid:number, params:any = {}) => del(`dis/me/bookshelf/books/${bid}`, params);
 export const addToBookshelf = async (bid:string, params:any = {}) => post(`books/${bid}/mark`, params);
 export const footsteps = async (type:string, params:any = {}) => post(`dis/footsteps/${type}`, params);
+export const getFootsteps = async (type:string, params:any = {}) => get(`dis/me/footsteps/${type}`, params);
 export const bookmark = async (bid:string, sid :string, params:any = {}) => post(`books/${bid}/sections/${sid}/mark`, params);

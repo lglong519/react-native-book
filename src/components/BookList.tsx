@@ -29,20 +29,20 @@ class BookList extends React.Component {
 	subTitle(item) {
 		if (!this.props.type || this.props.type === "views") {
 			return (
-				<Text>
+				<Text style={[styles.fontSmall, { flex: 0 }]}>
 					<Text style={styles.colorOrg}>{item.views}</Text>人在看
 				</Text>
 			);
 		}
 		if (this.props.type === "status") {
 			return (
-				<Text>
+				<Text style={[styles.fontSmall, { flex: 0 }]}>
 					<Text style={styles.colorOrg}>{item.status}</Text>
 				</Text>
 			);
 		}
 		return (
-			<Text>
+			<Text style={[styles.fontSmall, { flex: 0 }]}>
 				<Text style={styles.colorOrg}>{moment(item.updateDate)}完本</Text>
 			</Text>
 		);
@@ -57,16 +57,16 @@ class BookList extends React.Component {
 			<TouchableOpacity activeOpacity={0.5} key={index} style={styles.hotItem}
 				onPress={() => this.toSections(item.id)}>
 				<Image
-					style={{ width: 35, height: 50 }}
+					style={{ width: 45, height: 60 }}
 					source={{ uri: item.cover }}
 				/>
 				<View style={styles.itemRight}>
 					<View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-						<Text style={styles.colorEm}>{item.title}</Text>
+						<Text style={styles.colorEm} numberOfLines={1}>{item.title}</Text>
 						{this.subTitle(item)}
 					</View>
-					<Text>作者: {item.author}</Text>
-					<Text numberOfLines={1} ellipsizeMode={"tail"}>
+					<Text style={styles.fontSmall}>作者: {item.author}</Text>
+					<Text style={styles.fontSmall} numberOfLines={1} ellipsizeMode={"tail"}>
 						{item.info}
 					</Text>
 				</View>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
 	sectionHeader: {
 		flexDirection: "row",
 		alignItems: "center",
-		height: 30,
+		height: 35,
 		paddingLeft: 10,
 		borderBottomWidth: 0.5,
 		borderBottomColor: "#ccc",
@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingLeft: 8,
 		paddingRight: 10,
-		paddingBottom: 5,
-		paddingTop: 5,
+		paddingBottom: 10,
+		paddingTop: 10,
 		borderBottomWidth: 0.5,
 		borderColor: "#e2e2e2",
 		backgroundColor: "#fff",
@@ -130,13 +130,18 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 		justifyContent: "space-around",
 		paddingLeft: 8,
+		height: 65,
 	},
 	colorOrg: {
-		color: "#ff8040"
+		color: "#ff8040",
 	},
 	colorEm: {
 		color: "#333",
+		flex: 1,
 	},
+	fontSmall: {
+		fontSize: 12,
+	}
 });
 
 export default BookList;

@@ -51,8 +51,10 @@ class Header extends React.Component {
 							<Icon name={"bookmark"} size={22}/>
 						</Text>
 					</TouchableHighlight>
-					<Text style={styles.icon}>{this.props.title}</Text>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Bookshelf")}>
+					<View style={styles.titleBox}>
+						<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
+					</View>
+					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => {}}>
 						<Text style={styles.icon}>
 							<Icon name={"search"} size={22}/>
 						</Text>
@@ -68,7 +70,9 @@ class Header extends React.Component {
 							<Icon name={"home"} size={22}/>
 						</Text>
 					</TouchableHighlight>
-					<Text style={styles.icon}>{this.props.title}</Text>
+					<View style={styles.titleBox}>
+						<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
+					</View>
 					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Bookshelf")}>
 						<Text style={styles.icon}>
 							<Icon name={"bookmark"} size={22}/>
@@ -85,7 +89,9 @@ class Header extends React.Component {
 							<Icon name={"home"} size={22}/>
 						</Text>
 					</TouchableHighlight>
-					<Text style={styles.icon}>{this.props.title}</Text>
+					<View style={styles.titleBox}>
+						<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
+					</View>
 					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.logout()}>
 						<Text style={styles.icon}>
 							注销
@@ -101,7 +107,9 @@ class Header extends React.Component {
 						返回
 					</Text>
 				</TouchableOpacity>
-				<Text style={styles.icon}>{this.props.title}</Text>
+				<View style={styles.titleBox}>
+					<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
+				</View>
 				<TouchableOpacity onPress={() => this.navTo("Index")}>
 					<Text style={styles.btns}>
 						首页
@@ -124,7 +132,7 @@ const styles = StyleSheet.create({
 		height: 40,
 		backgroundColor: "#1abc9c",
 		paddingLeft: 15,
-		paddingRight: 15
+		paddingRight: 15,
 	},
 	touch: {
 		paddingLeft: 10,
@@ -139,6 +147,13 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		color: "#fff"
+	},
+	titleBox: {
+		flex: 1,
+		alignItems: "center",
+	},
+	title: {
+		color: "#fff",
 	},
 	btns: {
 		color: "#fff",

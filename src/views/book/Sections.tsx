@@ -8,6 +8,9 @@ import {
 	SectionList,
 	TouchableOpacity,
 	Alert,
+	Picker,
+	ActivityIndicator,
+	Dimensions,
 } from "react-native";
 import { Header, Footer } from "../../components";
 import { Moment } from "../../libs";
@@ -16,6 +19,7 @@ import {
 } from "../../libs/api";
 
 const moment = new Moment("yyyy-MM-dd hh:mm");
+const { width, height } = Dimensions.get("window");
 
 class Sections extends React.Component {
 	constructor(props) {
@@ -32,7 +36,13 @@ class Sections extends React.Component {
 				cover: undefined,
 			},
 			sections: [],
-			newSections: []
+			newSections: [],
+			count: 0,
+			pages: 0,
+			currentPage: 0,
+			pageSize: 20,
+			selectedIndex: 0,
+			loading: true,
 		};
 	}
 
@@ -89,13 +99,49 @@ class Sections extends React.Component {
 				newSections: result.data._55
 			});
 		});
+	}
+
+	async querySections() {
+		if (this.props.navigation && this.props.navigation.state && this.props.navigation.state.params && this.props.navigation.state.params.bid) {
+			//
+		} else {
+			return;
+		}
+		const { bid } = this.props.navigation.state.params;
+		await this.setState({
+			sections: [],
+			loading: true,
+		});
 		querySections(bid, {
-			pageSize: 20
+			pageSize: 20,
+			p: this.state.currentPage
 		}).then((result) => {
 			this.setState({
-				sections: result.data._55
+				sections: result.data._55,
+				count: result.headers.get("x-total-count"),
+				pages: result.headers.get("x-total-pages"),
+				loading: false,
 			});
 		});
+	}
+
+	pagination() {
+		let items = null;
+		let { pageSize } = this.state;
+		if (this.state.pages) {
+			items = Array.from({ length: this.state.pages }).map((e, i) => <Picker.Item key={i} label={`第${i + 1}页  第${i * pageSize + 1} - ${(i + 1) * pageSize}章`} value={i} />);
+		} else {
+			return null;
+		}
+		return <Picker
+			selectedValue={this.state.currentPage}
+			style={{ height: 50, flex: 1 }}
+			onValueChange={async (itemValue, itemIndex) => {
+				await this.setState({ currentPage: itemIndex });
+				this.querySections();
+			}}>
+			{items}
+		</Picker>;
 	}
 
 	async addToBookshelf() {
@@ -126,15 +172,19 @@ class Sections extends React.Component {
 	}
 
 	headerTitle() {
-		return `${this.state.book.title} 目录(共${this.state.sections.length}章)`;
+		return `${this.state.book.title} 目录(共${this.state.count}章)`;
 	}
 
 	toContents(sid) {
 		return this.props.navigation.navigate("Contents", { sid });
 	}
 
-	componentDidMount() {
-		this.fetchData();
+	async componentDidMount() {
+		await this.fetchData();
+		this.querySections();
+		this.setState({
+			loading: false,
+		});
 	}
 
 	cover() {
@@ -157,6 +207,25 @@ class Sections extends React.Component {
 		return null;
 	}
 
+	spinning() {
+		if (!this.state.loading) {
+			return null;
+		}
+		return <View style={{
+			zIndex: 100,
+			position: "absolute",
+			backgroundColor: "rgba(0,0,0,0.3)",
+			top: 0,
+			left: 0,
+			width,
+			height,
+			alignItems: "center",
+			justifyContent: "center",
+		}}>
+			<ActivityIndicator size="large" color="#1abc9c" />
+		</View>;
+	}
+
 	render() {
 		const overrideRenderHotItem = ({
 			item,
@@ -170,48 +239,52 @@ class Sections extends React.Component {
 			</TouchableOpacity>
 		);
 		return (
-			<ScrollView style={styles.container}>
-				<Header navigation={this.props.navigation} type={3}
-					title={this.headerTitle()} />
-				{this.cover()}
-				<View style={styles.buttonBox}>
-					<TouchableOpacity activeOpacity={0.5}
-						style={styles.button}
-						onPress={() => this.toContents(this.state.book.fid)}>
-						<Text style={{ color: "#fff" }}>开始阅读</Text>
-					</TouchableOpacity>
-					<TouchableOpacity activeOpacity={0.5}
-						onPress={() => this.addToBookshelf()}
-						style={styles.button}>
-						<Text style={{ color: "#fff" }}>加入书架</Text>
-					</TouchableOpacity>
-				</View>
-				<SectionList
-					style={styles.section}
-					renderItem={({ item, index, section }) => (
-						<Text style={styles.info} key={index}>{item}</Text>
-					)}
-					renderSectionHeader={this.renderSectionHeader}
-					sections={[
-						{
-							title: `${this.state.book.title}小说简介`,
-							data: [this.state.book.info],
-						},
-						{
-							title: `${this.state.book.title}最新章节`,
-							data: this.state.newSections,
-							renderItem: overrideRenderHotItem
-						},
-						{
-							title: "全部章节列表",
-							data: this.state.sections,
-							renderItem: overrideRenderHotItem
-						}
-					]}
-					keyExtractor={(item, index) => index}
-				/>
-				<Footer navigation={this.props.navigation}/>
-			</ScrollView>
+			<View>
+				{this.spinning()}
+				<ScrollView style={styles.container}>
+					<Header navigation={this.props.navigation} type={3}
+						title={this.headerTitle()} />
+					{this.cover()}
+					<View style={styles.buttonBox}>
+						<TouchableOpacity activeOpacity={0.5}
+							style={styles.button}
+							onPress={() => this.toContents(this.state.book.fid)}>
+							<Text style={{ color: "#fff" }}>开始阅读</Text>
+						</TouchableOpacity>
+						<TouchableOpacity activeOpacity={0.5}
+							onPress={() => this.addToBookshelf()}
+							style={styles.button}>
+							<Text style={{ color: "#fff" }}>加入书架</Text>
+						</TouchableOpacity>
+					</View>
+					<SectionList
+						style={styles.section}
+						renderItem={({ item, index, section }) => (
+							<Text style={styles.info} key={index}>{item}</Text>
+						)}
+						renderSectionHeader={this.renderSectionHeader}
+						sections={[
+							{
+								title: `${this.state.book.title}小说简介`,
+								data: [this.state.book.info],
+							},
+							{
+								title: `${this.state.book.title}最新章节`,
+								data: this.state.newSections,
+								renderItem: overrideRenderHotItem
+							},
+							{
+								title: "全部章节列表",
+								data: this.state.sections,
+								renderItem: overrideRenderHotItem
+							}
+						]}
+						keyExtractor={(item, index) => index}
+					/>
+					{this.pagination()}
+					<Footer navigation={this.props.navigation}/>
+				</ScrollView>
+			</View>
 		);
 	}
 }
@@ -240,9 +313,10 @@ const styles = StyleSheet.create({
 		backgroundColor: "#f4f4f4",
 	},
 	btitle: {
-		fontSize: 20,
+		fontSize: 18,
 		color: "#333",
 		marginBottom: 5,
+		flexWrap: "wrap",
 	},
 	info: {
 		padding: 8,
@@ -254,7 +328,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingLeft: 8,
 		paddingRight: 10,
-		paddingBottom: 6,
+		paddingBottom: 10,
 		paddingTop: 6,
 		borderBottomWidth: 0.5,
 		borderColor: "#e2e2e2",
@@ -262,6 +336,7 @@ const styles = StyleSheet.create({
 		marginBottom: 2,
 	},
 	itemRight: {
+		flex: 1,
 		flexDirection: "column",
 		justifyContent: "space-around",
 		paddingLeft: 15,
