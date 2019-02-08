@@ -103,7 +103,7 @@ export default class Signin extends Component {
 			}
 			await this.setState({ loading: true });
 			const token = await signup(_.pick(this.state, ["username", "password", "email", "client"]));
-			ToastAndroid.show("注册成功", ToastAndroid.SHORT);
+			await ToastAndroid.showWithGravity("注册成功", ToastAndroid.LONG, ToastAndroid.CENTER);
 			await global.storage.save({ key: "accessToken", data: token.accessToken });
 			this.props.navigation.navigate("Bookshelf");
 		} catch (e) {

@@ -11,6 +11,7 @@ import {
 	Picker,
 	ActivityIndicator,
 	Dimensions,
+	ToastAndroid,
 } from "react-native";
 import { Header, Footer } from "../../components";
 import { Moment } from "../../libs";
@@ -147,13 +148,7 @@ class Sections extends React.Component {
 	async addToBookshelf() {
 		try {
 			await addToBookshelf(this.state.book.id);
-			Alert.alert(
-				"提示",
-				"加入书架成功！",
-				[
-					{ text: "确定" },
-				],
-			);
+			await ToastAndroid.showWithGravity("加入书架成功！", ToastAndroid.SHORT, ToastAndroid.CENTER);
 		} catch (e) {
 			if (e === 401) {
 				Alert.alert(

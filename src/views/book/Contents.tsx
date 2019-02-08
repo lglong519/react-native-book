@@ -8,28 +8,27 @@ import {
 	TouchableOpacity,
 	ActivityIndicator,
 	Alert,
+	Dimensions,
+	ToastAndroid,
+	PanResponder,
 } from "react-native";
 import { Header, Footer } from "../../components";
 import { bookmark, footsteps, getContents } from "../../libs/api";
 
+const { width, height } = Dimensions.get("window");
 class Contents extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: {}
+			data: {},
+			pageY: 0,
 		};
 	}
 
 	async bookmark() {
 		try {
 			await bookmark(this.state.data.book, this.state.data.id);
-			Alert.alert(
-				"提示",
-				"加入书签成功！",
-				[
-					{ text: "确定" },
-				],
-			);
+			await ToastAndroid.showWithGravity("加入书签成功！", ToastAndroid.SHORT, ToastAndroid.CENTER);
 		} catch (e) {
 			if (e === 401) {
 				Alert.alert(
@@ -106,12 +105,12 @@ class Contents extends React.Component {
 			</TouchableOpacity>
 			<TouchableOpacity activeOpacity={0.5}
 				onPress={() => this.toContents(this.state.data.prev)}
-				style={styles.button}>
+				style={[styles.button, this.state.data.prev ? null : styles.diabled]}>
 				<Text style={{ color: "#fff" }}>上一章</Text>
 			</TouchableOpacity>
 			<TouchableOpacity activeOpacity={0.5}
 				onPress={() => this.toContents(this.state.data.next)}
-				style={styles.button}>
+				style={[styles.button, this.state.data.next ? null : styles.diabled]}>
 				<Text style={{ color: "#fff" }}>下一章</Text>
 			</TouchableOpacity>
 			<TouchableOpacity
@@ -127,16 +126,60 @@ class Contents extends React.Component {
 		this.fetchData();
 	}
 
+	componentWillMount() {
+		this._panResponder = PanResponder.create({
+			// 要求成为响应者：
+			onStartShouldSetPanResponder: (evt, gestureState) => true,
+			onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+			onMoveShouldSetPanResponder: (evt, gestureState) => true,
+			onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+			onPanResponderTerminationRequest: (evt, gestureState) => true,
+			onPanResponderRelease: (evt, gestureState) => {
+				// 上一页
+				if (gestureState.dx < 10 && gestureState.dy < 10 && gestureState.y0 < height / 2) {
+					this.refs.myScrollView.scrollTo({ x: 0, y: this.state.pageY - height + 35, animated: true });
+				}
+				// 下一页
+				if (gestureState.dx < 10 && gestureState.dy < 10 && gestureState.y0 > height / 2) {
+					this.refs.myScrollView.scrollTo({ x: 0, y: this.state.pageY + height - 35, animated: true });
+				}
+			},
+			onShouldBlockNativeResponder: (evt, gestureState) => false
+			// 返回一个布尔值，决定当前组件是否应该阻止原生组件成为JS响应者
+			// 默认返回true。目前暂时只支持android。
+			,
+		});
+	}
+
 	render() {
 		if (!this.state.data) {
 			return null;
 		}
-		return <ScrollView style={styles.container}>
+		return <ScrollView
+			style={styles.container}
+			ref="myScrollView"
+			onScroll = {(event) => {
+				{
+					this.setState({
+						pageY: event.nativeEvent.contentOffset.y
+					});
+				}
+			}}
+			scrollEventThrottle = {200}
+		>
 			<Header navigation={this.props.navigation} type={1}
+				ref={(view) => { this.header = view; }}
+				onLayout={(event) => {
+					this.layoutY = event.nativeEvent.layout.y;
+				}}
 				title={this.state.data.title} />
 			{this.btnGroups()}
 			{this.spinning()}
-			<View style={styles.contents}>
+
+			<View
+				style={styles.contents}
+				{...this._panResponder.panHandlers}
+			>
 				<Text>{this.contents()}</Text>
 			</View>
 			{this.btnGroups()}
@@ -169,6 +212,9 @@ const styles = StyleSheet.create({
 		height: 32,
 		backgroundColor: "#1abc9c",
 		borderRadius: 2,
+	},
+	diabled: {
+		opacity: 0.5
 	}
 });
 
