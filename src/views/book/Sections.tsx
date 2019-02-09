@@ -129,20 +129,51 @@ class Sections extends React.Component {
 	pagination() {
 		let items = null;
 		let { pageSize } = this.state;
-		if (this.state.pages) {
+		if (this.state.pages && !this.state.loading) {
 			items = Array.from({ length: this.state.pages }).map((e, i) => <Picker.Item key={i} label={`第${i + 1}页  第${i * pageSize + 1} - ${(i + 1) * pageSize}章`} value={i} />);
 		} else {
 			return null;
 		}
-		return <Picker
-			selectedValue={this.state.currentPage}
-			style={{ height: 50, flex: 1 }}
-			onValueChange={async (itemValue, itemIndex) => {
-				await this.setState({ currentPage: itemIndex });
-				this.querySections();
-			}}>
-			{items}
-		</Picker>;
+		return <View style={styles.buttonBox}>
+			<TouchableOpacity activeOpacity={0.5}
+				style={[styles.button, styles.pageBtn, this.state.currentPage ? null : styles.diabled]}
+				onPress={() => this.prev()}>
+				<Text style={{ color: "#fff" }}>上一页</Text>
+			</TouchableOpacity>
+			<Picker
+				selectedValue={this.state.currentPage}
+				style={{ height: 50, flex: 1 }}
+				onValueChange={async (itemValue, itemIndex) => {
+					await this.setState({ currentPage: itemIndex });
+					this.querySections();
+				}}>
+				{items}
+			</Picker>
+			<TouchableOpacity activeOpacity={0.5}
+				onPress={() => this.next()}
+				style={[
+					styles.button,
+					styles.pageBtn,
+					this.state.currentPage < this.state.pages - 1 ? null : styles.diabled]}>
+				<Text style={{ color: "#fff" }}>下一页</Text>
+			</TouchableOpacity>
+		</View>;
+	}
+
+	async next() {
+		if (this.state.currentPage >= this.state.pages - 1) {
+			return;
+		}
+		await this.setState({ currentPage: this.state.currentPage + 1 });
+		this.querySections();
+	}
+
+	async prev() {
+		if (this.state.currentPage <= 0) {
+			return;
+		}
+		await this.setState({ currentPage: this.state.currentPage - 1 });
+		this.querySections();
 	}
 
 	async addToBookshelf() {
@@ -236,7 +267,9 @@ class Sections extends React.Component {
 		return (
 			<View>
 				{this.spinning()}
-				<ScrollView style={styles.container}>
+				<ScrollView
+					ref="scrollView"
+					style={styles.container}>
 					<Header navigation={this.props.navigation} type={3}
 						title={this.headerTitle()} />
 					{this.cover()}
@@ -259,15 +292,17 @@ class Sections extends React.Component {
 						)}
 						renderSectionHeader={this.renderSectionHeader}
 						sections={[
-							{
-								title: `${this.state.book.title}小说简介`,
-								data: [this.state.book.info],
-							},
-							{
-								title: `${this.state.book.title}最新章节`,
-								data: this.state.newSections,
-								renderItem: overrideRenderHotItem
-							},
+							...this.state.currentPage ? [] : [
+								{
+									title: `${this.state.book.title}小说简介`,
+									data: [this.state.book.info],
+								},
+								{
+									title: `${this.state.book.title}最新章节`,
+									data: this.state.newSections,
+									renderItem: overrideRenderHotItem
+								},
+							],
 							{
 								title: "全部章节列表",
 								data: this.state.sections,
@@ -277,7 +312,9 @@ class Sections extends React.Component {
 						keyExtractor={(item, index) => index}
 					/>
 					{this.pagination()}
-					<Footer navigation={this.props.navigation}/>
+					<Footer
+						scrollView={this.refs.scrollView}
+						navigation={this.props.navigation}/>
 				</ScrollView>
 			</View>
 		);
@@ -342,6 +379,7 @@ const styles = StyleSheet.create({
 	buttonBox: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+		alignItems: "center",
 		marginTop: 8,
 		marginBottom: 8,
 	},
@@ -354,6 +392,14 @@ const styles = StyleSheet.create({
 		height: 35,
 		backgroundColor: "#1abc9c",
 		borderRadius: 5,
+	},
+	pageBtn: {
+		flex: 0,
+		paddingLeft: 8,
+		paddingRight: 8,
+	},
+	diabled: {
+		opacity: 0.5
 	}
 });
 

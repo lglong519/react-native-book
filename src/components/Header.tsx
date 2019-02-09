@@ -43,6 +43,10 @@ class Header extends React.Component {
 	}
 
 	render() {
+		let headerStyle = [styles.header];
+		if (this.props.bgType === "dark") {
+			headerStyle.push({ backgroundColor: "#999" });
+		}
 		if (this.props.type === 0) {
 			return (
 				<View style={styles.header}>
@@ -64,7 +68,7 @@ class Header extends React.Component {
 		}
 		if (this.props.type === 1) {
 			return (
-				<View style={styles.header}>
+				<View style={headerStyle}>
 					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Index")}>
 						<Text style={styles.icon}>
 							<Icon name={"home"} size={22}/>

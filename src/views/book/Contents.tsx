@@ -1,4 +1,5 @@
 import * as React from "react";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 import {
 	ScrollView,
@@ -22,6 +23,8 @@ class Contents extends React.Component {
 		this.state = {
 			data: {},
 			pageY: 0,
+			bgType: "cyan",
+			fontSize: 16,
 		};
 	}
 
@@ -68,7 +71,9 @@ class Contents extends React.Component {
 
 	contents() {
 		if (this.state.data && this.state.data.contents) {
-			return this.state.data.contents.replace(/(<br>)+/g, "\n");
+			return this.state.data.contents.replace(/(<br>)+/g, "\n")
+				.replace(/笔趣阁|(Ｗ|ｗ|W|w)\s*(Ｗ|ｗ|W|w)\s*(Ｗ|ｗ|W|w)(。|\.|．)*\s*(Ｂ|ｂ|b)\s*(ｉ|i|i)\s*(ｑ|q|q)\s*(ｕ|u|u)\s*(ｋ|k|k)\s*(ｅ|e|e)(。|\.|．)*\s*(Ｃ|ｃ|c)\s*(Ｏ|o|o)\s*(Ｍ|ｍ|m|m)/ig, "")
+				.replace(/(\n){3}/g, "\n");
 		}
 		return "";
 	}
@@ -97,29 +102,102 @@ class Contents extends React.Component {
 		if (!this.state.data.id) {
 			return null;
 		}
+		let bgType;
+		if (this.state.bgType === "dark") {
+			bgType = { backgroundColor: "#999" };
+		}
 		return <View style={styles.buttonBox}>
 			<TouchableOpacity activeOpacity={0.5}
-				style={styles.button}
+				style={[styles.button, bgType]}
 				onPress={() => this.toSections(this.state.data.book)}>
 				<Text style={{ color: "#fff" }}>目录</Text>
 			</TouchableOpacity>
 			<TouchableOpacity activeOpacity={0.5}
 				onPress={() => this.toContents(this.state.data.prev)}
-				style={[styles.button, this.state.data.prev ? null : styles.diabled]}>
+				style={[styles.button, bgType, this.state.data.prev ? null : styles.diabled]}>
 				<Text style={{ color: "#fff" }}>上一章</Text>
 			</TouchableOpacity>
 			<TouchableOpacity activeOpacity={0.5}
 				onPress={() => this.toContents(this.state.data.next)}
-				style={[styles.button, this.state.data.next ? null : styles.diabled]}>
+				style={[styles.button, bgType, this.state.data.next ? null : styles.diabled]}>
 				<Text style={{ color: "#fff" }}>下一章</Text>
 			</TouchableOpacity>
 			<TouchableOpacity
 				onPress={() => this.bookmark()}
 				activeOpacity={0.5}
-				style={styles.button}>
+				style={[styles.button, bgType]}>
 				<Text style={{ color: "#fff" }}>加书签</Text>
 			</TouchableOpacity>
 		</View>;
+	}
+
+	setBg(type) {
+		if (type === this.state.bgType) {
+			return;
+		}
+		this.setState({
+			bgType: type
+		});
+		global.storage.save({
+			key: "bgType",
+			data: type,
+		});
+	}
+
+	readingSettings() {
+		return <View style={styles.settingBox}>
+			<View style={styles.settingCell}>
+				<TouchableOpacity
+					onPress={() => this.setBg("white")}
+					activeOpacity={0.5}
+					style={[styles.settingBtn, styles.white]}>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => this.setBg("yellow")}
+					activeOpacity={0.5}
+					style={[styles.settingBtn, styles.yellow]}>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => this.setBg("cyan")}
+					activeOpacity={0.5}
+					style={[styles.settingBtn, styles.cyan]}>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => this.setBg("dark")}
+					activeOpacity={0.5}
+					style={[styles.settingBtn, styles.dark]}>
+					<Icon name={"moon-o"} size={16} style={{ color: "#A3A3A6" }}/>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.settingCell}>
+				<TouchableOpacity
+					onPress={() => this.setFontSize(-2)}
+					activeOpacity={0.5}
+					style={styles.settingBtn}>
+					<Text style={{ color: "#999" }}>A-</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => this.setFontSize(2)}
+					activeOpacity={0.5}
+					style={styles.settingBtn}>
+					<Text style={{ color: "#999" }}>A+</Text>
+				</TouchableOpacity>
+			</View>
+		</View>;
+	}
+
+	setFontSize(num) {
+		let fontSize = this.state.fontSize + num;
+		if (fontSize < 14 || fontSize > 28) {
+			return;
+		}
+		this.setState({
+			fontSize
+		});
+		global.storage.save({
+			key: "fontSize",
+			data: fontSize
+		});
 	}
 
 	componentDidMount() {
@@ -137,17 +215,25 @@ class Contents extends React.Component {
 			onPanResponderRelease: (evt, gestureState) => {
 				// 上一页
 				if (gestureState.dx < 10 && gestureState.dy < 10 && gestureState.y0 < height / 2) {
-					this.refs.myScrollView.scrollTo({ x: 0, y: this.state.pageY - height + 35, animated: true });
+					this.refs.scrollView.scrollTo({ x: 0, y: this.state.pageY - height + 35, animated: true });
 				}
 				// 下一页
 				if (gestureState.dx < 10 && gestureState.dy < 10 && gestureState.y0 > height / 2) {
-					this.refs.myScrollView.scrollTo({ x: 0, y: this.state.pageY + height - 35, animated: true });
+					this.refs.scrollView.scrollTo({ x: 0, y: this.state.pageY + height - 35, animated: true });
 				}
 			},
 			onShouldBlockNativeResponder: (evt, gestureState) => false
 			// 返回一个布尔值，决定当前组件是否应该阻止原生组件成为JS响应者
 			// 默认返回true。目前暂时只支持android。
 			,
+		});
+		global.storage.load({ key: "bgType" }).then((bgType) => {
+			this.setBg(bgType);
+		});
+		global.storage.load({ key: "fontSize" }).then((fontSize) => {
+			this.setState({
+				fontSize
+			});
 		});
 	}
 
@@ -156,8 +242,8 @@ class Contents extends React.Component {
 			return null;
 		}
 		return <ScrollView
-			style={styles.container}
-			ref="myScrollView"
+			style={[styles.container, styles[this.state.bgType]]}
+			ref="scrollView"
 			onScroll = {(event) => {
 				{
 					this.setState({
@@ -167,23 +253,28 @@ class Contents extends React.Component {
 			}}
 			scrollEventThrottle = {200}
 		>
-			<Header navigation={this.props.navigation} type={1}
+			<Header
+				navigation={this.props.navigation} type={1}
+				bgType={this.state.bgType}
 				ref={(view) => { this.header = view; }}
 				onLayout={(event) => {
 					this.layoutY = event.nativeEvent.layout.y;
 				}}
 				title={this.state.data.title} />
 			{this.btnGroups()}
+			{this.readingSettings()}
 			{this.spinning()}
-
 			<View
 				style={styles.contents}
 				{...this._panResponder.panHandlers}
 			>
-				<Text>{this.contents()}</Text>
+				<Text style={[styles[`${this.state.bgType}Text`], { fontSize: this.state.fontSize }]}>{this.contents()}</Text>
 			</View>
 			{this.btnGroups()}
-			<Footer navigation={this.props.navigation}/>
+			<Footer
+				navigation={this.props.navigation}
+				bgType={this.state.bgType}
+				scrollView={this.refs.scrollView}/>
 		</ScrollView>;
 	}
 }
@@ -215,7 +306,53 @@ const styles = StyleSheet.create({
 	},
 	diabled: {
 		opacity: 0.5
-	}
+	},
+	settingBox: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		paddingHorizontal: 5,
+		marginTop: 8,
+	},
+	settingCell: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	settingBtn: {
+		height: 22,
+		width: 30,
+		borderRadius: 5,
+		borderWidth: 1,
+		borderColor: "#ccc",
+		justifyContent: "center",
+		alignItems: "center",
+		marginHorizontal: 2,
+	},
+	cyan: {
+		backgroundColor: "#e7f4fe",
+	},
+	yellow: {
+		backgroundColor: "#CFC0A9",
+	},
+	white: {
+		backgroundColor: "#fff",
+	},
+	dark: {
+		backgroundColor: "#4B4B4D",
+	},
+	cyanText: {
+		color: "#777",
+	},
+	yellowText: {
+		color: "#666",
+	},
+	whiteText: {
+		color: "#666",
+	},
+	darkText: {
+		color: "#BCBCBF",
+	},
+
 });
 
 

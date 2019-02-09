@@ -22,15 +22,32 @@ class Footer extends React.Component {
 		return this.props.navigation.navigate(type);
 	}
 
+	toTop() {
+		if (this.props.scrollView) {
+			let footerItemStyle = [styles.footerItem];
+			if (this.props.bgType === "dark") {
+				footerItemStyle.push({ color: "#BCBCBF" });
+			}
+			return <TouchableOpacity onPress={() => this.props.scrollView.scrollTo({ x: 0, y: 0, animated: true })}>
+				<Text style={footerItemStyle}>返回顶部</Text>
+			</TouchableOpacity>;
+		}
+	}
+
 	render() {
+		let footerItemStyle = [styles.footerItem];
+		if (this.props.bgType === "dark") {
+			footerItemStyle.push({ color: "#BCBCBF" });
+		}
 		return (
 			<View style={styles.footer}>
 				<TouchableOpacity onPress={() => this.navTo("Index")}>
-					<Text style={styles.footerItem}>首页</Text>
+					<Text style={footerItemStyle}>首页</Text>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={() => this.navTo("Bookshelf")}>
-					<Text style={styles.footerItem}>书架</Text>
+					<Text style={footerItemStyle}>书架</Text>
 				</TouchableOpacity>
+				{this.toTop()}
 			</View>
 		);
 	}

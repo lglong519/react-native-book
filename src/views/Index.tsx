@@ -193,7 +193,9 @@ class Index extends React.Component {
 
 	render() {
 		return (
-			<ScrollView style={styles.container}>
+			<ScrollView
+				ref="scrollView"
+				style={styles.container}>
 				<Header navigation={this.props.navigation} type={0} title={"MoFunc"}/>
 				<Nav navigation={this.props.navigation}/>
 				{this.spinning()}
@@ -201,7 +203,9 @@ class Index extends React.Component {
 				{this.swiper()}
 				<BookList navigation={this.props.navigation} books={this.state.hotData} title={"热门推荐"} type={"views"}/>
 				{this.recentSection()}
-				<Footer navigation={this.props.navigation}/>
+				<Footer
+					scrollView={this.refs.scrollView}
+					navigation={this.props.navigation}/>
 			</ScrollView>
 		);
 	}
