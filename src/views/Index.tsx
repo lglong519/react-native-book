@@ -27,7 +27,9 @@ class Index extends React.Component {
 		this.state = {
 			loading: true,
 			hotData: [],
-			recentData: []
+			recentData: [],
+			searchData: [],
+			searchVisible: false,
 		};
 	}
 
@@ -85,14 +87,14 @@ class Index extends React.Component {
 	}
 
 	recSection() {
+		if (!this.state.hotData.length || this.state.searchVisible) {
+			return null;
+		}
 		const overrideRenderRecBox = ({ item }) => (
 			<View style={styles.recContent}>
 				{item.map((data, i) => this.renderRecSubCell(data, i))}
 			</View>
 		);
-		if (!this.state.hotData.length) {
-			return null;
-		}
 		return <SectionList
 			style={[styles.section, { marginBottom: 0 }]}
 			renderItem={({ item, index, section }) => (
@@ -111,6 +113,9 @@ class Index extends React.Component {
 	}
 
 	recentSection() {
+		if (!this.state.recentData.length || this.state.searchVisible) {
+			return null;
+		}
 		const overrideRenderRecentItem = ({
 			item,
 			index,
@@ -140,9 +145,6 @@ class Index extends React.Component {
 				</View>
 			</TouchableOpacity>
 		);
-		if (!this.state.recentData.length) {
-			return null;
-		}
 		return <SectionList
 			style={styles.section}
 			renderItem={({ item, index, section }) => (
@@ -168,6 +170,9 @@ class Index extends React.Component {
 	}
 
 	swiper() {
+		if (this.state.searchVisible) {
+			return null;
+		}
 		let imgs = this.state.hotData.slice(0, 3).map(item => ({
 			uri: item.cover
 		}));
@@ -187,6 +192,56 @@ class Index extends React.Component {
 		return null;
 	}
 
+	hot() {
+		if (this.state.searchVisible) {
+			return null;
+		}
+		return <BookList navigation={this.props.navigation} books={this.state.hotData} title={"热门推荐"} type={"views"}/>;
+	}
+
+	searchBooks() {
+		if (!this.state.searchVisible) {
+			return null;
+		}
+		if (!this.state.searchData.length) {
+			return <View style={{
+				paddingVertical: 30,
+				justifyContent: "center",
+				alignItems: "center",
+			}}>
+				<Text>没有更多内容了</Text>
+			</View>;
+		}
+		return <BookList navigation={this.props.navigation} books={this.state.searchData} title={"搜索结果"} type={"views"}/>;
+	}
+
+	async search(data = {}) {
+		if (data.searchValue) {
+			await this.setState({
+				loading: true
+			});
+			await getBooks({
+				sort: "-updateDate",
+				like: {
+					[data.searchType]: data.searchValue,
+				},
+			}).then((results) => {
+				this.setState({
+					searchData: results
+				});
+			}).catch((error) => {
+				console.error(error);
+			});
+			return this.setState({
+				loading: false,
+				searchVisible: true,
+			});
+		}
+		this.setState({
+			searchVisible: false,
+		});
+	}
+
 	componentDidMount() {
 		this.fetchData();
 	}
@@ -196,12 +251,17 @@ class Index extends React.Component {
 			<ScrollView
 				ref="scrollView"
 				style={styles.container}>
-				<Header navigation={this.props.navigation} type={0} title={"MoFunc"}/>
+				<Header
+					search={this.search.bind(this)}
+					navigation={this.props.navigation}
+					type={0}
+					title={"MoFunc"}/>
 				<Nav navigation={this.props.navigation}/>
 				{this.spinning()}
+				{this.searchBooks()}
 				{this.recSection()}
 				{this.swiper()}
-				<BookList navigation={this.props.navigation} books={this.state.hotData} title={"热门推荐"} type={"views"}/>
+				{this.hot()}
 				{this.recentSection()}
 				<Footer
 					scrollView={this.refs.scrollView}

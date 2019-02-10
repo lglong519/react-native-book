@@ -72,7 +72,7 @@ class Contents extends React.Component {
 	contents() {
 		if (this.state.data && this.state.data.contents) {
 			return this.state.data.contents.replace(/(<br>)+/g, "\n")
-				.replace(/笔趣阁|(Ｗ|ｗ|W|w)\s*(Ｗ|ｗ|W|w)\s*(Ｗ|ｗ|W|w)(。|\.|．)*\s*(Ｂ|ｂ|b)\s*(ｉ|i|i)\s*(ｑ|q|q)\s*(ｕ|u|u)\s*(ｋ|k|k)\s*(ｅ|e|e)(。|\.|．)*\s*(Ｃ|ｃ|c)\s*(Ｏ|o|o)\s*(Ｍ|ｍ|m|m)/ig, "")
+				.replace(/笔\.*\s*．*趣\.*\s*．*阁|(Ｗ|ｗ|W|w)\s*(Ｗ|ｗ|W|w)\s*(Ｗ|ｗ|W|w)(。|\.|．)*\s*(Ｂ|ｂ|b)\s*(ｉ|i|i)\s*(ｑ|q|q)\s*(ｕ|u|u)\s*(ｋ|k|k)\s*(ｅ|e|e)(。|\.|．)*\s*(Ｃ|ｃ|c)\s*(Ｏ|o|o)\s*(Ｍ|ｍ|m|m)/ig, "")
 				.replace(/(\n){3}/g, "\n");
 		}
 		return "";

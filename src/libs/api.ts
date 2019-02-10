@@ -79,7 +79,12 @@ export async function get(url:string, params:any = {}) {
 	let fullUrl = `${baseUrl}${url}`;
 	await initToken();
 	if (params) {
-		const paramsArray = Object.keys(params).map(key => `${key}=${params[key]}`);
+		const paramsArray = Object.keys(params).map((key) => {
+			if (typeof params[key] === "object") {
+				return `${key}=${JSON.stringify(params[key])}`;
+			}
+			return `${key}=${params[key]}`;
+		});
 		if (/\?/.test(url)) {
 			fullUrl += `&${paramsArray.join("&")}`;
 		} else {

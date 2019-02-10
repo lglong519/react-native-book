@@ -8,11 +8,18 @@ import {
 	TouchableOpacity,
 	TouchableHighlight,
 	Alert,
+	TextInput,
 } from "react-native";
 
 class Header extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			searchType: "title",
+			searchValue: "",
+			loading: false,
+			searchVisible: false,
+		};
 	}
 
 	async navTo(type) {
@@ -42,6 +49,36 @@ class Header extends React.Component {
 		);
 	}
 
+	switchSearchType() {
+		let searchType = "authortitle".replace(this.state.searchType, "");
+		this.setState({
+			searchType
+		});
+	}
+
+	search() {
+		this.props.search({
+			searchType: this.state.searchType,
+			searchValue: this.state.searchValue,
+		});
+	}
+
+	toggleSearch() {
+		let searchVisible = !this.state.searchVisible;
+		this.setState({
+			searchVisible
+		});
+		if (!searchVisible) {
+			this.setState({
+				searchValue: ""
+			});
+			this.props.search({
+				searchType: this.state.searchType,
+				searchValue: "",
+			});
+		}
+	}
+
 	render() {
 		let headerStyle = [styles.header];
 		if (this.props.bgType === "dark") {
@@ -49,20 +86,47 @@ class Header extends React.Component {
 		}
 		if (this.props.type === 0) {
 			return (
-				<View style={styles.header}>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Bookshelf")}>
-						<Text style={styles.icon}>
-							<Icon name={"bookmark"} size={22}/>
-						</Text>
-					</TouchableHighlight>
-					<View style={styles.titleBox}>
-						<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
+				<View>
+					<View style={styles.header}>
+						<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Bookshelf")}>
+							<Text style={styles.icon}>
+								<Icon name={"bookmark"} size={22}/>
+							</Text>
+						</TouchableHighlight>
+						<View style={styles.titleBox}>
+							<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
+						</View>
+						<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.toggleSearch()}>
+							<Text style={styles.icon}>
+								<Icon name={"search"} size={22}/>
+							</Text>
+						</TouchableHighlight>
 					</View>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => {}}>
-						<Text style={styles.icon}>
-							<Icon name={"search"} size={22}/>
-						</Text>
-					</TouchableHighlight>
+					{this.state.searchVisible ? (
+						<View style={styles.searchBox}>
+							<TouchableOpacity
+								onPress={() => this.switchSearchType()}
+								style={styles.searchType}>
+								<Text>
+									{this.state.searchType === "author" ? "作者" : "书名"}
+								</Text>
+							</TouchableOpacity>
+							<View style={styles.searchInputBox}>
+								<TextInput
+									ref="search"
+									style={styles.searchInput}
+									lineHeight={12}
+									placeholder='输入搜索内容'
+									underlineColorAndroid="transparent"
+									onChangeText={searchValue => this.setState({ searchValue })}
+								/>
+							</View>
+							<TouchableOpacity
+								onPress={() => this.search()}
+								style={styles.searchBtn}>
+								<Icon name={"search"} size={22} color="#fff"/>
+							</TouchableOpacity>
+						</View>) : null}
 				</View>
 			);
 		}
@@ -167,6 +231,43 @@ const styles = StyleSheet.create({
 		paddingTop: 2,
 		paddingBottom: 2,
 		borderRadius: 1.5,
+	},
+	searchBox: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		paddingVertical: 10,
+		backgroundColor: "#fff",
+	},
+	searchInputBox: {
+		height: 30,
+		width: "50%",
+		borderWidth: 1,
+		borderColor: "#ccc",
+		alignItems: "center",
+		flexDirection: "row",
+	},
+	searchInput: {
+		padding: 0,
+		width: "100%",
+		height: 30,
+		paddingLeft: 5,
+	},
+	searchBtn: {
+		height: 30,
+		width: "15%",
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "#1ce0b9",
+	},
+	searchType: {
+		height: 30,
+		width: "12%",
+		borderWidth: 1,
+		borderColor: "#ccc",
+		alignItems: "center",
+		justifyContent: "center",
+		marginRight: 5,
 	},
 });
 
