@@ -294,11 +294,11 @@ class Sections extends React.Component {
 						sections={[
 							...this.state.currentPage ? [] : [
 								{
-									title: `${this.state.book.title}小说简介`,
+									title: "小说简介",
 									data: [this.state.book.info],
 								},
 								{
-									title: `${this.state.book.title}最新章节`,
+									title: "最新章节",
 									data: this.state.newSections,
 									renderItem: overrideRenderHotItem
 								},

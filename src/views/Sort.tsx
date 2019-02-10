@@ -6,35 +6,38 @@ import {
 	View,
 	SectionList,
 	TouchableOpacity,
+	ActivityIndicator,
 } from "react-native";
 import {
 	Header, Nav, Footer, BookList
 } from "../components";
 import { queryBooks } from "../libs/api";
-
+/*
+	切换类型要重置:currentPage.title,sort,sortData
+*/
 const blocks = [
 	{
-		name: "玄幻小说",
+		title: "玄幻小说",
 		sort: "xuanhuan",
 	},
 	{
-		name: "修真小说",
+		title: "修真小说",
 		sort: "xiuzhen",
 	},
 	{
-		name: "都市小说",
+		title: "都市小说",
 		sort: "dushi",
 	},
 	{
-		name: "穿越小说",
+		title: "穿越小说",
 		sort: "chuanyue",
 	},
 	{
-		name: "网游小说",
+		title: "网游小说",
 		sort: "wangyou",
 	},
 	{
-		name: "科幻小说",
+		title: "科幻小说",
 		sort: "kehuan",
 	},
 ];
@@ -44,7 +47,12 @@ class Sort extends React.Component {
 		super(props);
 		this.state = {
 			sortData: [],
+			title: "",
 			sort: "",
+			pages: 0,
+			currentPage: 0,
+			pageSize: 20,
+			loading: false,
 		};
 	}
 
@@ -53,21 +61,68 @@ class Sort extends React.Component {
 		gesturesEnabled: true,
 	};
 
-	queryBooks(item) {
-		this.setState({
-			sort: item.name
+	async queryBooks(item) {
+		await this.setState({
+			sort: item.sort,
+			title: item.title,
+			loading: true,
 		});
 		queryBooks({
 			q: `{"sort":"${item.sort}"}`,
 			sort: "-updateDate",
-			p: 0
+			pageSize: this.state.pageSize,
+			p: this.state.currentPage,
 		}).then((res) => {
 			this.setState({
-				sortData: res.data._55
+				sortData: this.state.sortData.concat(res.data._55),
+				pages: res.headers.get("x-total-pages"),
+				loading: false,
 			});
 		}).catch((error) => {
 			console.error(error);
+			this.setState({ loading: false });
 		});
+	}
+
+	async loadMore(e: Object) {
+		if ((this.state.pages && this.state.currentPage >= this.state.pages - 1) || !this.state.title) {
+			return;
+		}
+		let offsetY = e.nativeEvent.contentOffset.y; // 滑动距离
+		let contentSizeHeight = e.nativeEvent.contentSize.height; // scrollView contentSize高度
+		let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height; // scrollView高度
+		if (Math.abs(offsetY + oriageScrollHeight - contentSizeHeight) < 10) {
+			await this.setState({ currentPage: this.state.currentPage + 1 });
+			this.queryBooks({ title: this.state.title, sort: this.state.sort });
+		}
+	}
+
+	showMore() {
+		if (this.state.loading) {
+			return (<View style={{
+				paddingVertical: 30,
+				justifyContent: "center",
+				alignItems: "center",
+				flexDirection: "row",
+			}}>
+				<ActivityIndicator size="small" color="#1abc9c" />
+				<Text>正在加载</Text>
+			</View>);
+		}
+		if (!this.state.sortData.length) {
+			return null;
+		}
+		let str = "加载更多";
+		if (this.state.currentPage >= this.state.pages - 1) {
+			str = "没有更多内容了";
+		}
+		return (<View style={{
+			paddingVertical: 15,
+			justifyContent: "center",
+			alignItems: "center",
+		}}>
+			<Text>{str}</Text>
+		</View>);
 	}
 
 	toSections(bid) {
@@ -77,10 +132,18 @@ class Sort extends React.Component {
 	render() {
 		const renderRecSubCell = (item, index) => (
 			<TouchableOpacity key={index}
-				onPress={() => this.queryBooks(item)}
-				style={[styles.sortItem, this.state.sort === item.name ? styles.activeBg : null]}>
+				onPress={async () => {
+					await this.setState({
+						sortData: [],
+						title: "",
+						sort: "",
+						currentPage: 0,
+					});
+					this.queryBooks(item);
+				}}
+				style={[styles.sortItem, this.state.title === item.title ? styles.activeBg : null]}>
 				<Text
-					style={[this.state.sort === item.name ? styles.activeClr : null]}>{item.name}</Text>
+					style={[this.state.title === item.title ? styles.activeClr : null]}>{item.title}</Text>
 			</TouchableOpacity>
 		);
 		const overrideRenderRecBox = ({ item }) => (
@@ -89,24 +152,30 @@ class Sort extends React.Component {
 			</View>
 		);
 		return (
-			<ScrollView style={styles.container}>
+			<ScrollView
+				ref="scrollView"
+				onMomentumScrollEnd = {this.loadMore.bind(this)}
+				style={styles.container}>
 				<Header navigation={this.props.navigation} type={1} title={"小说分类"}/>
 				<Nav navigation={this.props.navigation}/>
 				<SectionList style={{ margin: 5 }}
 					renderItem={({ item, index, section }) => (
-						<Text style={styles.sortItem} key={index}>{item.name}</Text>
+						<Text style={styles.sortItem} key={index}>{item.title}</Text>
 					)}
 					sections={[
 						{
-							title: this.state.sort,
+							title: this.state.title,
 							data: [blocks],
 							renderItem: overrideRenderRecBox
 						}
 					]}
 					keyExtractor={(item, index) => index}
 				/>
-				<BookList navigation={this.props.navigation} books={this.state.sortData} title={this.state.sort} type={"status"}/>
-				<Footer navigation={this.props.navigation}/>
+				<BookList navigation={this.props.navigation} books={this.state.sortData} title={this.state.title} type={"status"}/>
+				{this.showMore()}
+				<Footer
+					scrollView={this.refs.scrollView}
+					navigation={this.props.navigation}/>
 			</ScrollView>
 		);
 	}
