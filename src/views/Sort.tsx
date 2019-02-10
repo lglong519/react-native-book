@@ -152,31 +152,33 @@ class Sort extends React.Component {
 			</View>
 		);
 		return (
-			<ScrollView
-				ref="scrollView"
-				onMomentumScrollEnd = {this.loadMore.bind(this)}
-				style={styles.container}>
+			<View style={{ paddingBottom: 40 }}>
 				<Header navigation={this.props.navigation} type={1} title={"小说分类"}/>
-				<Nav navigation={this.props.navigation}/>
-				<SectionList style={{ margin: 5 }}
-					renderItem={({ item, index, section }) => (
-						<Text style={styles.sortItem} key={index}>{item.title}</Text>
-					)}
-					sections={[
-						{
-							title: this.state.title,
-							data: [blocks],
-							renderItem: overrideRenderRecBox
-						}
-					]}
-					keyExtractor={(item, index) => index}
-				/>
-				<BookList navigation={this.props.navigation} books={this.state.sortData} title={this.state.title} type={"status"}/>
-				{this.showMore()}
-				<Footer
-					scrollView={this.refs.scrollView}
-					navigation={this.props.navigation}/>
-			</ScrollView>
+				<ScrollView
+					ref="scrollView"
+					onMomentumScrollEnd = {this.loadMore.bind(this)}
+					style={styles.container}>
+					<Nav navigation={this.props.navigation}/>
+					<SectionList style={{ margin: 5 }}
+						renderItem={({ item, index, section }) => (
+							<Text style={styles.sortItem} key={index}>{item.title}</Text>
+						)}
+						sections={[
+							{
+								title: this.state.title,
+								data: [blocks],
+								renderItem: overrideRenderRecBox
+							}
+						]}
+						keyExtractor={(item, index) => index}
+					/>
+					<BookList navigation={this.props.navigation} books={this.state.sortData} title={this.state.title} type={"status"}/>
+					{this.showMore()}
+					<Footer
+						scrollView={this.refs.scrollView}
+						navigation={this.props.navigation}/>
+				</ScrollView>
+			</View>
 		);
 	}
 }

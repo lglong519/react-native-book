@@ -1,4 +1,8 @@
-# React Native Web with TypeScript
+# React Native Book
+
+## release
+
+**v1.0:** <a href="./release/com.book.android_1_0.apk" target="_blank">com.book.android_1_0.apk</a>
 
 ## install
 

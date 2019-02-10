@@ -25,6 +25,7 @@ class Contents extends React.Component {
 			pageY: 0,
 			bgType: "cyan",
 			fontSize: 16,
+			showHeader: true,
 		};
 	}
 
@@ -213,19 +214,39 @@ class Contents extends React.Component {
 			onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 			onPanResponderTerminationRequest: (evt, gestureState) => true,
 			onPanResponderRelease: (evt, gestureState) => {
+				if (gestureState.dx > 10 || gestureState.dy > 10) {
+					return;
+				}
+				// 中间 80
+				let center = 80;
+				let up = (height - center) / 2;
+				let down = up + center;
+				// 中间
+				if (gestureState.y0 > up && gestureState.y0 < down) {
+					this.setState({
+						showHeader: !this.state.showHeader,
+					});
+				}
 				// 上一页
-				if (gestureState.dx < 10 && gestureState.dy < 10 && gestureState.y0 < height / 2) {
+				if (gestureState.y0 < up) {
 					this.refs.scrollView.scrollTo({ x: 0, y: this.state.pageY - height + 35, animated: true });
 				}
 				// 下一页
-				if (gestureState.dx < 10 && gestureState.dy < 10 && gestureState.y0 > height / 2) {
+				if (gestureState.y0 > down) {
 					this.refs.scrollView.scrollTo({ x: 0, y: this.state.pageY + height - 35, animated: true });
 				}
 			},
-			onShouldBlockNativeResponder: (evt, gestureState) => false
 			// 返回一个布尔值，决定当前组件是否应该阻止原生组件成为JS响应者
 			// 默认返回true。目前暂时只支持android。
-			,
+			onShouldBlockNativeResponder: (evt, gestureState) => false,
+			// 判断手势 上/下
+			onPanResponderMove: (evt, gestureState) => {
+				// ToastAndroid.showWithGravity(`xxx+++${gestureState.dy}`, ToastAndroid.SHORT, ToastAndroid.CENTER);
+				if (gestureState.dy > 0) {
+					// 下
+				}
+				// 上
+			}
 		});
 		global.storage.load({ key: "bgType" }).then((bgType) => {
 			this.setBg(bgType);
@@ -237,45 +258,63 @@ class Contents extends React.Component {
 		});
 	}
 
+	header() {
+		if (this.state.showHeader) {
+			return <Header
+				navigation={this.props.navigation} type={1}
+				bgType={this.state.bgType}
+				title={this.state.data.title} />;
+		}
+		return <View style={{
+			height: 40, opacity: 0, top: 0, position: "absolute"
+		}}></View>;
+	}
+
 	render() {
 		if (!this.state.data) {
 			return null;
 		}
-		return <ScrollView
-			style={[styles.container, styles[this.state.bgType]]}
-			ref="scrollView"
-			onScroll = {(event) => {
-				{
-					this.setState({
-						pageY: event.nativeEvent.contentOffset.y
-					});
-				}
-			}}
-			scrollEventThrottle = {200}
-		>
-			<Header
-				navigation={this.props.navigation} type={1}
-				bgType={this.state.bgType}
-				ref={(view) => { this.header = view; }}
-				onLayout={(event) => {
-					this.layoutY = event.nativeEvent.layout.y;
-				}}
-				title={this.state.data.title} />
-			{this.btnGroups()}
-			{this.readingSettings()}
-			{this.spinning()}
+		return (
 			<View
-				style={styles.contents}
-				{...this._panResponder.panHandlers}
-			>
-				<Text style={[styles[`${this.state.bgType}Text`], { fontSize: this.state.fontSize }]}>{this.contents()}</Text>
+				style={[styles.container, styles[this.state.bgType]]}>
+				{this.header()}
+				<ScrollView
+					ref="scrollView"
+					onScroll = {(event) => {
+						{
+							this.setState({
+								pageY: event.nativeEvent.contentOffset.y
+							});
+							if (event.nativeEvent.contentOffset.y < height / 2) {
+								this.setState({
+									showHeader: true,
+								});
+							} else {
+								this.setState({
+									showHeader: false,
+								});
+							}
+						}
+					}}
+					scrollEventThrottle = {200}
+				>
+					{this.btnGroups()}
+					{this.readingSettings()}
+					{this.spinning()}
+					<View
+						style={styles.contents}
+						{...this._panResponder.panHandlers}
+					>
+						<Text style={[styles[`${this.state.bgType}Text`], { fontSize: this.state.fontSize }]}>{this.contents()}</Text>
+					</View>
+					{this.btnGroups()}
+					<Footer
+						navigation={this.props.navigation}
+						bgType={this.state.bgType}
+						scrollView={this.refs.scrollView}/>
+				</ScrollView>
 			</View>
-			{this.btnGroups()}
-			<Footer
-				navigation={this.props.navigation}
-				bgType={this.state.bgType}
-				scrollView={this.refs.scrollView}/>
-		</ScrollView>;
+		);
 	}
 }
 
@@ -283,7 +322,8 @@ class Contents extends React.Component {
 // styles
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: "#e7f4fe"
+		flex: 1,
+		backgroundColor: "#e7f4fe",
 	},
 	contents: {
 		padding: 10

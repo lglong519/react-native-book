@@ -265,13 +265,13 @@ class Sections extends React.Component {
 			</TouchableOpacity>
 		);
 		return (
-			<View>
+			<View style={{ paddingBottom: 40 }}>
 				{this.spinning()}
+				<Header navigation={this.props.navigation} type={3}
+					title={this.headerTitle()} />
 				<ScrollView
 					ref="scrollView"
 					style={styles.container}>
-					<Header navigation={this.props.navigation} type={3}
-						title={this.headerTitle()} />
 					{this.cover()}
 					<View style={styles.buttonBox}>
 						<TouchableOpacity activeOpacity={0.5}

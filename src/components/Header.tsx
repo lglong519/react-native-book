@@ -238,11 +238,13 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		paddingVertical: 10,
 		backgroundColor: "#fff",
+		borderBottomWidth: 0.8,
+		borderBottomColor: "#ccc",
 	},
 	searchInputBox: {
 		height: 30,
 		width: "50%",
-		borderWidth: 1,
+		borderWidth: 0.8,
 		borderColor: "#ccc",
 		alignItems: "center",
 		flexDirection: "row",
@@ -263,7 +265,7 @@ const styles = StyleSheet.create({
 	searchType: {
 		height: 30,
 		width: "12%",
-		borderWidth: 1,
+		borderWidth: 0.8,
 		borderColor: "#ccc",
 		alignItems: "center",
 		justifyContent: "center",

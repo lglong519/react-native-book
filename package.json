@@ -1,6 +1,6 @@
 {
   "name": "Book",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "reload": "adb shell input keyevent 82",

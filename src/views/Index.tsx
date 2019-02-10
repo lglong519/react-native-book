@@ -248,25 +248,27 @@ class Index extends React.Component {
 
 	render() {
 		return (
-			<ScrollView
-				ref="scrollView"
-				style={styles.container}>
+			<View style={{ paddingBottom: 40 }}>
 				<Header
 					search={this.search.bind(this)}
 					navigation={this.props.navigation}
 					type={0}
 					title={"MoFunc"}/>
-				<Nav navigation={this.props.navigation}/>
-				{this.spinning()}
-				{this.searchBooks()}
-				{this.recSection()}
-				{this.swiper()}
-				{this.hot()}
-				{this.recentSection()}
-				<Footer
-					scrollView={this.refs.scrollView}
-					navigation={this.props.navigation}/>
-			</ScrollView>
+				<ScrollView
+					ref="scrollView"
+					style={styles.container}>
+					<Nav navigation={this.props.navigation}/>
+					{this.spinning()}
+					{this.searchBooks()}
+					{this.recSection()}
+					{this.swiper()}
+					{this.hot()}
+					{this.recentSection()}
+					<Footer
+						scrollView={this.refs.scrollView}
+						navigation={this.props.navigation}/>
+				</ScrollView>
+			</View>
 		);
 	}
 }
@@ -275,7 +277,7 @@ class Index extends React.Component {
 // styles
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: "#F5F5F5"
+		backgroundColor: "#F5F5F5",
 	},
 	recContent: {
 		flexDirection: "row",

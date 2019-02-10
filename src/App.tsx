@@ -46,7 +46,7 @@ const RouteConfigs = {
 const StackNavigatorConfig = {
 	headerMode: "none",
 	mode: Platform.OS === "ios" ? "modal" : "card",
-	initialRouteName: "Full",
+	initialRouteName: "Index",
 	transitionConfig: () => ({
 		screenInterpolator: CardStackStyleInterpolator.forHorizontal,
 	})

@@ -179,17 +179,19 @@ class Index extends React.Component {
 
 	render() {
 		return (
-			<ScrollView
-				ref="scrollView"
-				style={styles.container}>
+			<View style={{ paddingBottom: 40 }}>
 				<Header navigation={this.props.navigation} type={2} title={"我的书架"}/>
-				<Nav navigation={this.props.navigation}/>
-				{this.bookList()}
-				{this.recentSteps()}
-				<Footer
-					scrollView={this.refs.scrollView}
-					navigation={this.props.navigation}/>
-			</ScrollView>
+				<ScrollView
+					ref="scrollView"
+					style={styles.container}>
+					<Nav navigation={this.props.navigation}/>
+					{this.bookList()}
+					{this.recentSteps()}
+					<Footer
+						scrollView={this.refs.scrollView}
+						navigation={this.props.navigation}/>
+				</ScrollView>
+			</View>
 		);
 	}
 }
