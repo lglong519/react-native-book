@@ -14,10 +14,12 @@ import {
 	ToastAndroid,
 } from "react-native";
 import { Header, Footer } from "../../components";
-import { Moment } from "../../libs";
 import {
-	addToBookshelf, footsteps, querySections, getBook
-} from "../../libs/api";
+	addToBookshelf, footsteps, querySections, getBook,
+	Moment,
+	toContents,
+	navTo,
+} from "../../libs";
 
 const moment = new Moment("yyyy-MM-dd hh:mm");
 const { width, height } = Dimensions.get("window");
@@ -189,7 +191,7 @@ class Sections extends React.Component {
 						{ text: "取消" },
 						{
 							text: "确定",
-							onPress: async () => this.props.navigation.navigate("Signin")
+							onPress: async () => navTo(this.props, "Signin")
 						},
 					],
 				);
@@ -199,10 +201,6 @@ class Sections extends React.Component {
 
 	headerTitle() {
 		return `${this.state.book.title} 目录(共${this.state.count}章)`;
-	}
-
-	toContents(sid) {
-		return this.props.navigation.navigate("Contents", { sid });
 	}
 
 	async componentDidMount() {
@@ -259,7 +257,7 @@ class Sections extends React.Component {
 			section: { title, data }
 		}) => (
 			<TouchableOpacity activeOpacity={0.5}
-				onPress={() => this.toContents(item.id)}
+				onPress={() => toContents(this.props, item.id)}
 				key={index} style={styles.hotItem}>
 				<Text>{item.title}</Text>
 			</TouchableOpacity>
@@ -276,7 +274,7 @@ class Sections extends React.Component {
 					<View style={styles.buttonBox}>
 						<TouchableOpacity activeOpacity={0.5}
 							style={styles.button}
-							onPress={() => this.toContents(this.state.book.fid)}>
+							onPress={() => toContents(this.props, this.state.book.fid)}>
 							<Text style={{ color: "#fff" }}>开始阅读</Text>
 						</TouchableOpacity>
 						<TouchableOpacity activeOpacity={0.5}

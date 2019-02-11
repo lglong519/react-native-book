@@ -11,7 +11,7 @@ import {
 import {
 	Nav, Footer, Header, BookList
 } from "../components";
-import { queryBooks } from "../libs/api";
+import { queryBooks } from "../libs";
 
 const blocks = [
 	{
@@ -165,10 +165,6 @@ class Top extends React.Component {
 		</View>);
 	}
 
-	toSections(bid) {
-		return this.props.navigation.navigate("Sections", { bid });
-	}
-
 	componentDidMount() {
 		// this.fetchData();
 	}
@@ -202,7 +198,7 @@ class Top extends React.Component {
 					ref="scrollView"
 					onMomentumScrollEnd = {this.loadMore.bind(this)}
 					style={styles.container}>
-					<Nav navigation={this.props.navigation}/>
+					<Nav navigation={this.props.navigation} route="Top"/>
 					<SectionList style={{ margin: 5 }}
 						renderItem={({ item, index, section }) => (
 							<Text style={styles.sortItem} key={index}>{item.title}</Text>

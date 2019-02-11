@@ -2,7 +2,8 @@
 
 ## release
 
-**v1.0:** <a href="./release/com.book.android_1_0.apk" target="_blank">com.book.android_1_0.apk</a>
+**v1.0:** <a href="./release/com.book.android_1_0.apk?raw=true" target="_blank">com.book.android_1_0.apk</a>
+**v1.1:** <a href="./release/com.book.android_1_1.apk?raw=true" target="_blank">com.book.android_1_1.apk</a>
 
 ## install
 

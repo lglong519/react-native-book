@@ -9,8 +9,10 @@ import {
 	Alert,
 } from "react-native";
 import { Nav, Footer, Header } from "../../components";
-import { getBookshelf, delBookshelf, getFootsteps } from "../../libs/api";
-import { Moment } from "../../libs";
+import {
+	getBookshelf, delBookshelf, getFootsteps, Moment,
+	toSections, toContents, navTo
+} from "../../libs";
 
 const moment = new Moment("MM-dd hh:mm:ss");
 
@@ -35,7 +37,7 @@ class Index extends React.Component {
 			await this.setState({ books: bookshelf.books });
 		} catch (e) {
 			if (e === 401) {
-				return this.props.navigation.navigate("Signin");
+				return navTo(this.props, "Signin");
 			}
 		}
 	}
@@ -43,17 +45,6 @@ class Index extends React.Component {
 	async getFootsteps() {
 		let steps = await getFootsteps("section");
 		await this.setState({ footsteps: steps });
-	}
-
-	toSections(bid) {
-		return this.props.navigation.navigate("Sections", { bid });
-	}
-
-	toContents(sid) {
-		if (!sid) {
-			return;
-		}
-		this.props.navigation.navigate("Contents", { sid });
 	}
 
 	remove(item) {
@@ -80,13 +71,13 @@ class Index extends React.Component {
 			section: { title, data }
 		}) => (
 			<View key={index} style={styles.markItem}>
-				<TouchableOpacity onPress={() => this.toSections(item.book)}>
+				<TouchableOpacity onPress={() => toSections(this.props, item.book)}>
 					<Text style={styles.lineHeight}>书名: {item.btitle}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.toContents(item.sid)}>
+				<TouchableOpacity onPress={() => toContents(this.props, item.sid)}>
 					<Text style={styles.lineHeight}>最新: {item.stitle}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.toContents(item.mid)}>
+				<TouchableOpacity onPress={() => toContents(this.props, item.mid)}>
 					<Text style={styles.lineHeight}>书签: {item.mtitle || "无"}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={() => this.remove(item)}>
@@ -126,7 +117,8 @@ class Index extends React.Component {
 				<View style={{ flex: 1 }}>
 					<View
 						style={{ flexDirection: "row", justifyContent: "space-between" }}>
-						<TouchableOpacity activeOpacity={0.5} style={{ flex: 1 }} onPress={() => this.toContents(item.data.section)}>
+						<TouchableOpacity activeOpacity={0.5} style={{ flex: 1 }}
+							onPress={() => toContents(this.props, item.data.section)}>
 							<Text style={styles.colorEm} numberOfLines={1}>
 								{item.data.stitle}
 							</Text>
@@ -135,7 +127,7 @@ class Index extends React.Component {
 							{moment(item.updatedAt)}
 						</Text>
 					</View>
-					<TouchableOpacity activeOpacity={0.5} onPress={() => this.toSections(item.data.book)}>
+					<TouchableOpacity activeOpacity={0.5} onPress={() => toSections(this.props, item.data.book)}>
 						<Text numberOfLines={1} ellipsizeMode={"tail"} style={{ marginTop: 8, fontSize: 12 }}>
 							{item.data.btitle}
 						</Text>
@@ -188,6 +180,7 @@ class Index extends React.Component {
 					{this.bookList()}
 					{this.recentSteps()}
 					<Footer
+						route="Bookshelf"
 						scrollView={this.refs.scrollView}
 						navigation={this.props.navigation}/>
 				</ScrollView>

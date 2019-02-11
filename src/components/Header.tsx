@@ -10,6 +10,7 @@ import {
 	Alert,
 	TextInput,
 } from "react-native";
+import { navTo } from "../libs";
 
 class Header extends React.Component {
 	constructor(props) {
@@ -22,16 +23,6 @@ class Header extends React.Component {
 		};
 	}
 
-	async navTo(type) {
-		if (type === "Bookshelf") {
-			const accessToken = await global.storage.load({ key: "accessToken" });
-			if (!accessToken) {
-				return this.props.navigation.navigate("Signin");
-			}
-		}
-		return this.props.navigation.navigate(type);
-	}
-
 	logout() {
 		Alert.alert(
 			"提示",
@@ -42,7 +33,7 @@ class Header extends React.Component {
 					text: "确定",
 					onPress: async () => {
 						await global.storage.remove({ key: "accessToken" });
-						this.navTo("Index");
+						navTo(this.props, "Index");
 					}
 				},
 			],
@@ -88,7 +79,8 @@ class Header extends React.Component {
 			return (
 				<View>
 					<View style={styles.header}>
-						<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Bookshelf")}>
+						<TouchableHighlight style={styles.touch} underlayColor={"#00A686"}
+							onPress={() => navTo(this.props, "Bookshelf")}>
 							<Text style={styles.icon}>
 								<Icon name={"bookmark"} size={22}/>
 							</Text>
@@ -133,7 +125,8 @@ class Header extends React.Component {
 		if (this.props.type === 1) {
 			return (
 				<View style={headerStyle}>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Index")}>
+					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"}
+						onPress={() => navTo(this.props, "Index")}>
 						<Text style={styles.icon}>
 							<Icon name={"home"} size={22}/>
 						</Text>
@@ -141,7 +134,8 @@ class Header extends React.Component {
 					<View style={styles.titleBox}>
 						<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
 					</View>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Bookshelf")}>
+					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"}
+						onPress={() => navTo(this.props, "Bookshelf")}>
 						<Text style={styles.icon}>
 							<Icon name={"bookmark"} size={22}/>
 						</Text>
@@ -152,7 +146,8 @@ class Header extends React.Component {
 		if (this.props.type === 2) {
 			return (
 				<View style={styles.header}>
-					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"} onPress={() => this.navTo("Index")}>
+					<TouchableHighlight style={styles.touch} underlayColor={"#00A686"}
+						onPress={() => navTo(this.props, "Index")}>
 						<Text style={styles.icon}>
 							<Icon name={"home"} size={22}/>
 						</Text>
@@ -178,7 +173,7 @@ class Header extends React.Component {
 				<View style={styles.titleBox}>
 					<Text style={styles.title} numberOfLines={1}>{this.props.title}</Text>
 				</View>
-				<TouchableOpacity onPress={() => this.navTo("Index")}>
+				<TouchableOpacity onPress={() => navTo(this.props, "Index")}>
 					<Text style={styles.btns}>
 						首页
 					</Text>

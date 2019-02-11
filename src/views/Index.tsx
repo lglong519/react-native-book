@@ -14,12 +14,12 @@ import PageScrollView from "../components/PageScrollView";
 import {
 	Header, Nav, Footer, BookList
 } from "../components";
-import { Moment } from "../libs";
-import { getBooks } from "../libs/api";
+import { Moment, toSections, getBooks } from "../libs";
 
 const { width: w, height: h } = Dimensions.get("window");
 
 const moment = new Moment("MM-dd hh:mm:ss");
+const route = "Index";
 
 class Index extends React.Component {
 	constructor(props) {
@@ -47,14 +47,10 @@ class Index extends React.Component {
 		);
 	};
 
-	toSections(bid) {
-		return this.props.navigation.navigate("Sections", { bid });
-	}
-
 	renderRecSubCell(item, index) {
 		return (
 			<TouchableOpacity activeOpacity={0.5} key={index} style={styles.recItem}
-				onPress={() => this.toSections(item.id)}>
+				onPress={() => toSections(this.props, item.id)}>
 				<Image
 					style={{ width: 100, height: 130 }}
 					source={{
@@ -123,7 +119,7 @@ class Index extends React.Component {
 		}) => (
 			<TouchableOpacity
 				activeOpacity={0.5}
-				onPress={() => this.toSections(item.id)}
+				onPress={() => toSections(this.props, item.id)}
 				key={index} style={styles.hotItem}
 			>
 				<Text style={{ alignSelf: "flex-start" }}>{index + 1}.</Text>
@@ -257,7 +253,7 @@ class Index extends React.Component {
 				<ScrollView
 					ref="scrollView"
 					style={styles.container}>
-					<Nav navigation={this.props.navigation}/>
+					<Nav navigation={this.props.navigation} route={route}/>
 					{this.spinning()}
 					{this.searchBooks()}
 					{this.recSection()}
@@ -265,6 +261,7 @@ class Index extends React.Component {
 					{this.hot()}
 					{this.recentSection()}
 					<Footer
+						route={route}
 						scrollView={this.refs.scrollView}
 						navigation={this.props.navigation}/>
 				</ScrollView>

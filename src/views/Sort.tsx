@@ -11,7 +11,7 @@ import {
 import {
 	Header, Nav, Footer, BookList
 } from "../components";
-import { queryBooks } from "../libs/api";
+import { queryBooks } from "../libs";
 /*
 	切换类型要重置:currentPage.title,sort,sortData
 */
@@ -125,10 +125,6 @@ class Sort extends React.Component {
 		</View>);
 	}
 
-	toSections(bid) {
-		return this.props.navigation.navigate("Sections", { bid });
-	}
-
 	render() {
 		const renderRecSubCell = (item, index) => (
 			<TouchableOpacity key={index}
@@ -158,7 +154,7 @@ class Sort extends React.Component {
 					ref="scrollView"
 					onMomentumScrollEnd = {this.loadMore.bind(this)}
 					style={styles.container}>
-					<Nav navigation={this.props.navigation}/>
+					<Nav navigation={this.props.navigation} route="Sort"/>
 					<SectionList style={{ margin: 5 }}
 						renderItem={({ item, index, section }) => (
 							<Text style={styles.sortItem} key={index}>{item.title}</Text>

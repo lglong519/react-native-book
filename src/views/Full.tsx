@@ -10,7 +10,7 @@ import {
 import {
 	Nav, Footer, Header, BookList
 } from "../components";
-import { queryBooks } from "../libs/api";
+import { queryBooks } from "../libs";
 
 class Index extends React.Component {
 	constructor(props) {
@@ -93,7 +93,7 @@ class Index extends React.Component {
 					ref="scrollView"
 					onMomentumScrollEnd = {this.loadMore.bind(this)}
 					style={styles.container}>
-					<Nav navigation={this.props.navigation}/>
+					<Nav navigation={this.props.navigation} route="Full"/>
 					<BookList navigation={this.props.navigation} books={this.state.fullData} title={"完本小说"} type={"full"}/>
 					{this.showMore()}
 					<Footer

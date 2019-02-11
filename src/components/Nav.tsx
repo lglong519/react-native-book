@@ -6,29 +6,26 @@ import {
 	View,
 	TouchableOpacity
 } from "react-native";
+import { navTo } from "../libs";
 
 class Nav extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 
-	navTo(type) {
-		return this.props.navigation.navigate(type);
-	}
-
 	render() {
 		return (
 			<View style={styles.nav}>
-				<TouchableOpacity style={styles.nvaButton} onPress={() => this.navTo("Index") }>
+				<TouchableOpacity style={styles.nvaButton} onPress={() => navTo(this.props, "Index") }>
 					<Text>首页</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.nvaButton} onPress={() => this.navTo("Sort") }>
+				<TouchableOpacity style={styles.nvaButton} onPress={() => navTo(this.props, "Sort") }>
 					<Text>分类</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.nvaButton} onPress={() => this.navTo("Top") }>
+				<TouchableOpacity style={styles.nvaButton} onPress={() => navTo(this.props, "Top") }>
 					<Text>排行</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.nvaButton} onPress={() => this.navTo("Full") }>
+				<TouchableOpacity style={styles.nvaButton} onPress={() => navTo(this.props, "Full") }>
 					<Text>完本</Text>
 				</TouchableOpacity>
 			</View>

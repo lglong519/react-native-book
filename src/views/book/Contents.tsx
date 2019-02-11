@@ -14,7 +14,10 @@ import {
 	PanResponder,
 } from "react-native";
 import { Header, Footer } from "../../components";
-import { bookmark, footsteps, getContents } from "../../libs/api";
+import {
+	bookmark, footsteps, getContents,
+	toSections, toContents, navTo
+} from "../../libs";
 
 const { width, height } = Dimensions.get("window");
 class Contents extends React.Component {
@@ -42,7 +45,7 @@ class Contents extends React.Component {
 						{ text: "取消" },
 						{
 							text: "确定",
-							onPress: async () => this.props.navigation.navigate("Signin")
+							onPress: async () => navTo(this.props, "Signin")
 						},
 					],
 				);
@@ -79,17 +82,6 @@ class Contents extends React.Component {
 		return "";
 	}
 
-	toSections(bid) {
-		return this.props.navigation.navigate("Sections", { bid });
-	}
-
-	toContents(sid) {
-		if (!sid) {
-			return;
-		}
-		this.props.navigation.navigate("Contents", { sid });
-	}
-
 	spinning() {
 		if (!this.state.data.id) {
 			return <View>
@@ -110,16 +102,16 @@ class Contents extends React.Component {
 		return <View style={styles.buttonBox}>
 			<TouchableOpacity activeOpacity={0.5}
 				style={[styles.button, bgType]}
-				onPress={() => this.toSections(this.state.data.book)}>
+				onPress={() => toSections(this.props, this.state.data.book)}>
 				<Text style={{ color: "#fff" }}>目录</Text>
 			</TouchableOpacity>
 			<TouchableOpacity activeOpacity={0.5}
-				onPress={() => this.toContents(this.state.data.prev)}
+				onPress={() => toContents(this.props, this.state.data.prev)}
 				style={[styles.button, bgType, this.state.data.prev ? null : styles.diabled]}>
 				<Text style={{ color: "#fff" }}>上一章</Text>
 			</TouchableOpacity>
 			<TouchableOpacity activeOpacity={0.5}
-				onPress={() => this.toContents(this.state.data.next)}
+				onPress={() => toContents(this.props, this.state.data.next)}
 				style={[styles.button, bgType, this.state.data.next ? null : styles.diabled]}>
 				<Text style={{ color: "#fff" }}>下一章</Text>
 			</TouchableOpacity>

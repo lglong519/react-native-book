@@ -1,5 +1,5 @@
 {
-  "name": "Book",
+  "name": "book",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.120",
+    "@types/react-navigation": "^3.0.1",
     "babel-eslint": "^10.0.1",
     "babel-jest": "21.2.0",
     "babel-preset-react-native": "4.0.0",

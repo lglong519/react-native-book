@@ -6,20 +6,11 @@ import {
 	View,
 	TouchableOpacity
 } from "react-native";
+import { navTo } from "../libs";
 
 class Footer extends React.Component {
 	constructor(props) {
 		super(props);
-	}
-
-	async navTo(type) {
-		if (type === "Bookshelf") {
-			const accessToken = await global.storage.load({ key: "accessToken" });
-			if (!accessToken) {
-				return this.props.navigation.navigate("Signin");
-			}
-		}
-		return this.props.navigation.navigate(type);
 	}
 
 	toTop() {
@@ -41,10 +32,10 @@ class Footer extends React.Component {
 		}
 		return (
 			<View style={styles.footer}>
-				<TouchableOpacity onPress={() => this.navTo("Index")}>
+				<TouchableOpacity onPress={() => navTo(this.props, "Index")}>
 					<Text style={footerItemStyle}>首页</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.navTo("Bookshelf")}>
+				<TouchableOpacity onPress={() => navTo(this.props, "Bookshelf")}>
 					<Text style={footerItemStyle}>书架</Text>
 				</TouchableOpacity>
 				{this.toTop()}

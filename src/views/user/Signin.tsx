@@ -12,7 +12,7 @@ import {
 	Alert,
 } from "react-native";
 import * as _ from "lodash";
-import { signin } from "../../libs/api";
+import { signin, navTo } from "../../libs";
 
 
 import { Header, Nav, Footer } from "../../components";
@@ -81,7 +81,7 @@ export default class Signin extends Component {
 			const token = await signin(_.pick(this.state, ["login", "password", "client"]));
 			await ToastAndroid.showWithGravity("登录成功", ToastAndroid.LONG, ToastAndroid.CENTER);
 			await global.storage.save({ key: "accessToken", data: token.accessToken });
-			this.props.navigation.navigate("Bookshelf");
+			navTo(this.props, "Bookshelf");
 		} catch (e) {
 			await this.setState({ loading: false });
 		}
@@ -129,7 +129,7 @@ export default class Signin extends Component {
 					borderRadius={2}
 					onPress={() => this.signin()}
 					title='登录' />
-				<TouchableOpacity onPress={() => this.props.navigation.navigate("Signup")} style={styles.labelBtn}>
+				<TouchableOpacity onPress={() => navTo(this.props, "Signup")} style={styles.labelBtn}>
 					<FormLabel labelStyle={{ color: "#1abc9c" }}>注册帐号</FormLabel>
 				</TouchableOpacity>
 				<Footer navigation={this.props.navigation}/>

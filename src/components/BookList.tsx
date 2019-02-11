@@ -7,7 +7,7 @@ import {
 	SectionList,
 	TouchableOpacity
 } from "react-native";
-import { Moment } from "../libs";
+import { Moment, toSections } from "../libs";
 
 const moment = new Moment("yyyy-MM-dd");
 
@@ -20,10 +20,6 @@ interface Props{
 class BookList extends React.Component {
 	constructor(props:Props) {
 		super(props);
-	}
-
-	toSections(bid) {
-		return this.props.navigation.navigate("Sections", { bid });
 	}
 
 	subTitle(item) {
@@ -55,7 +51,7 @@ class BookList extends React.Component {
 			section: { title, data }
 		}) => (
 			<TouchableOpacity activeOpacity={0.5} key={index} style={styles.hotItem}
-				onPress={() => this.toSections(item.id)}>
+				onPress={() => toSections(this.props, item.id)}>
 				<Image
 					style={{ width: 45, height: 60 }}
 					source={{ uri: item.cover }}
