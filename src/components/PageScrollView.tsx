@@ -138,8 +138,10 @@ builtinStyles={
 		let customW = null; let
 			customH = null;
 		if (builtinWH) { customW = builtinWH.width; customH = builtinWH.height; }
-		const widimage = customW || (w * 0.6); const wid = isH ? widimage : viewWidth; const hei = isH ? viewHeight : customH || (widimage / 16 * 9); const
-			heimage = customH || (widimage / 16 * 9);
+		const widimage = customW || (w * 0.6);
+		const wid = isH ? widimage : viewWidth;
+		const hei = isH ? viewHeight : customH || (widimage / 16 * 9);
+		const heimage = customH || (widimage / 16 * 9);
 		return (
 			<View style={[{
 				width: wid, height: hei, alignItems: "center", justifyContent: "center", backgroundColor: "#fff", opacity
@@ -465,7 +467,8 @@ onScroll=(e) => {
 		this.state.scrollYArr.push(e.nativeEvent.contentOffset.y);
 		scrollPage = e.nativeEvent.contentOffset.y / this.distance;
 	}
-	if (this.props.ifInfinite && Math.abs(scrollPage - Math.ceil(scrollPage)) < 0.1 && !this.state.ifTouch) { // 处理无限轮播,自动轮播滚动时的情况
+	if (this.props.ifInfinite && Math.abs(scrollPage - Math.ceil(scrollPage)) < 0.1 && !this.state.ifTouch) {
+		// 处理无限轮播,自动轮播滚动时的情况
 		setTimeout(() => { this.infiniteScroll(Math.ceil(scrollPage)); }, 200);
 	} else {
 		this.setState({ currentPage: scrollPage, });

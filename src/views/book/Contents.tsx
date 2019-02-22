@@ -20,6 +20,7 @@ import {
 } from "../../libs";
 
 const { width, height } = Dimensions.get("window");
+let headerTimer;
 class Contents extends React.Component {
 	constructor(props) {
 		super(props);
@@ -205,6 +206,9 @@ class Contents extends React.Component {
 			onMoveShouldSetPanResponder: (evt, gestureState) => true,
 			onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 			onPanResponderTerminationRequest: (evt, gestureState) => true,
+			// 开始手势操作
+			onPanResponderGrant: (evt, gestureState) => {},
+			// 释放所有的触摸点
 			onPanResponderRelease: (evt, gestureState) => {
 				if (gestureState.dx > 10 || gestureState.dy > 10) {
 					return;
@@ -215,10 +219,35 @@ class Contents extends React.Component {
 				let down = up + center;
 				// 中间
 				if (gestureState.y0 > up && gestureState.y0 < down) {
-					this.setState({
-						showHeader: !this.state.showHeader,
-					});
+					// 接近顶部时不再切换 header
+					if (this.state.pageY > 80) {
+						this.setState({
+							showHeader: !this.state.showHeader,
+						});
+					} else {
+						this.setState({
+							showHeader: true,
+						});
+					}
+					return;
 				}
+				// 点击屏幕时根据 View y轴的移动距离切换 header
+				if (headerTimer) {
+					clearTimeout(headerTimer);
+				}
+				headerTimer = setTimeout(() => {
+					if (this.state.pageY < height / 2) {
+						this.setState({
+							showHeader: true,
+						});
+					} else {
+						this.setState({
+							showHeader: false,
+						});
+					}
+					clearTimeout(headerTimer);
+					headerTimer = null;
+				}, 200);
 				// 上一页
 				if (gestureState.y0 < up) {
 					this.refs.scrollView.scrollTo({ x: 0, y: this.state.pageY - height + 35, animated: true });
@@ -233,12 +262,14 @@ class Contents extends React.Component {
 			onShouldBlockNativeResponder: (evt, gestureState) => false,
 			// 判断手势 上/下
 			onPanResponderMove: (evt, gestureState) => {
-				// ToastAndroid.showWithGravity(`xxx+++${gestureState.dy}`, ToastAndroid.SHORT, ToastAndroid.CENTER);
+				// ToastAndroid.showWithGravity(`moving ${gestureState.dy}`, ToastAndroid.SHORT, ToastAndroid.CENTER);
 				if (gestureState.dy > 0) {
 					// 下
 				}
 				// 上
-			}
+			},
+			// 另一个组件已经成为了新的响应者，所以当前手势将被取消
+			onPanResponderTerminate: (evt, gestureState) => {},
 		});
 		global.storage.load({ key: "bgType" }).then((bgType) => {
 			this.setBg(bgType);
@@ -277,15 +308,18 @@ class Contents extends React.Component {
 							this.setState({
 								pageY: event.nativeEvent.contentOffset.y
 							});
-							if (event.nativeEvent.contentOffset.y < height / 2) {
-								this.setState({
-									showHeader: true,
-								});
-							} else {
-								this.setState({
-									showHeader: false,
-								});
-							}
+						}
+					}}
+					// 滚动结束后切换 header
+					onMomentumScrollEnd = {(event) => {
+						if (event.nativeEvent.contentOffset.y < height / 2) {
+							this.setState({
+								showHeader: true,
+							});
+						} else {
+							this.setState({
+								showHeader: false,
+							});
 						}
 					}}
 					scrollEventThrottle = {200}
